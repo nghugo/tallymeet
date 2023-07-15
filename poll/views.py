@@ -7,4 +7,6 @@ def base(request):
 
 def home(request):
     return render(request, "poll/home.html", {'title': 'Home'})
-    
+
+def happy(request):
+    return render(request, "poll/happy.html")
