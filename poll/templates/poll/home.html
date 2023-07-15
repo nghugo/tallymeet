@@ -1,25 +1,27 @@
-{% extends "base.html" %}
+{% extends "poll/base.html" %}
 
-{% block title %}{{ section.title }}{% endblock %}
+{% block title %}{{ section.title }}{% endblock title %}
 
 {% block content %}
 <h1>{{ section.title }}</h1>
 
-{% for story in story_list %}
+NOW THIS IS SOME CONTENT!!
+
+<article>
+  <p class="text-justify text-base">
+    Having trouble identifying when to schedule the next meeting with your group? 
+    TallyMeet comes to the rescue. Share a simple poll with the group to see when everyone is available!
+    And best of all- it's a free service with no advertisements. Tally up now!
+  </p>
+</article>
+
+<!-- {% for story in story_list %}
 <h2>
   <a href="{{ story.get_absolute_url }}">
     {{ story.headline|upper }}
   </a>
 </h2>
 <p>{{ story.tease|truncatewords:"100" }}</p>
-{% endfor %}
-{% endblock %}
+{% endfor %} -->
+{% endblock content %}
 
-<article>
-    <p class="text-justify text-base">
-      Having trouble identifying when to schedule the next meeting with your group? 
-      TallyMeet comes to the rescue. Share a simple poll with the group to see when everyone is available!
-      And best of all- it's a free service with no advertisements. Tally up now!
-    </p>
-
-  </article>
