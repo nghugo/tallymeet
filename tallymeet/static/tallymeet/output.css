@@ -775,6 +775,14 @@ video {
   margin-right: 1.25rem;
 }
 
+.mb-60 {
+  margin-bottom: 15rem;
+}
+
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
+
 .box-border {
   box-sizing: border-box;
 }
@@ -1485,6 +1493,11 @@ video {
     margin: 0px;
   }
 
+  .md\:mx-0 {
+    margin-left: 0px;
+    margin-right: 0px;
+  }
+
   .md\:block {
     display: block;
   }
@@ -1537,6 +1550,10 @@ video {
     .md\:md\:max-w-lg {
       max-width: 32rem;
     }
+  }
+
+  .md\:text-left {
+    text-align: left;
   }
 
   .md\:text-7xl {
