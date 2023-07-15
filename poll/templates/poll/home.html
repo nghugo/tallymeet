@@ -5,23 +5,19 @@
 {% block content %}
 <h1>{{ section.title }}</h1>
 
-NOW THIS IS SOME CONTENT!!
-
 <article>
   <p class="text-justify text-base">
-    Having trouble identifying when to schedule the next meeting with your group? 
-    TallyMeet comes to the rescue. Share a simple poll with the group to see when everyone is available!
-    And best of all- it's a free service with no advertisements. Tally up now!
+    Having trouble identifying when to schedule your next group meeting?
+    TallyMeet comes to the rescue! Create and share a simple poll to see when everyone is available!
+    And best of all- it's a free service with no ads and no registration needed. Tally up now!
   </p>
 </article>
 
-<!-- {% for story in story_list %}
-<h2>
-  <a href="{{ story.get_absolute_url }}">
-    {{ story.headline|upper }}
-  </a>
-</h2>
-<p>{{ story.tease|truncatewords:"100" }}</p>
-{% endfor %} -->
+<a href="#" class="text-base font-medium px-1 w-28 h-6 rounded-md outline-1outline text-white flex justify-center items-center bg-purple-600 transition-all duration-150 ease-out hover:scale-110 m-auto sm:m-0">
+  <span>Quick Start</span>
+  <span class="inline-block material-symbols-rounded">arrow_right_alt</span>
+</a>
+
+
 {% endblock content %}
 
