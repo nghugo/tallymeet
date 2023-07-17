@@ -1,8 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django import forms
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from passlib.handlers.django import django_pbkdf2_sha256
+
 from .forms import PollPasswordForm
 
 from .models import Poll
@@ -17,18 +19,6 @@ def base(request):  # for debugging
 
 def happy(request):  # for debugging, no inheritance
     return render(request, "poll/happy.html")
-
-def poll_password(request):
-    if request.method == 'POST':
-        form = PollPasswordForm(request.POST)
-        if form.is_valid():
-            pass
-            # do something
-            # return redirect # next parameter??
-    else:  # GET request
-        form = PollPasswordForm()
-
-    return render(request, 'poll/poll_password.html', {'form': form})
 
 # recall default template for class based view: APP/MODEL_VIEWTYPE.html
 class PollCreateView(CreateView):  
@@ -59,6 +49,33 @@ class PollDetailView(PermissionRequiredMixin, DetailView):  # default template i
     login_url = '/poll/password/'
     permission_denied_message = 'Poll password required to access this page'
 
+    def get(self, request, *args, **kwargs):
+        self.object= self.get_object()
+        poll_password_hashed = self.object.poll_password
+
+        entered_password = self.request.session.get('entered_password', "")
+        if poll_password_hashed and not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed):
+            return redirect('poll-password')
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
+
+    # def get_object(self):  # only get poll with no password or if password match
+    #     obj = super().get_object()
+    #     poll_password_hashed = obj.poll_password
+    #     if not poll_password_hashed:  # poll has no password
+    #         return obj
+    #     else:  # poll has password
+    #         entered_password = self.request.session.get('entered_password')
+    #         if django_pbkdf2_sha256.verify(entered_password, poll_password_hashed):
+    #             return obj
+    #         else:
+    #             redirect()
+
+    # def dispatch(self, request, *args, **kwargs):
+    #     if not self.request.user.has_profile():
+    #         return redirect('users:userprofile')
+    #     return super().dispatch(request, *args, **kwargs)
+
     # def get_context_data(self, *kwargs):
     #     context = super.get_context_date(**kwargs)
 
@@ -67,5 +84,15 @@ class PollDetailView(PermissionRequiredMixin, DetailView):  # default template i
         return True
 
 
+def poll_password(request):
+    if request.method == 'POST':
+        form = PollPasswordForm(request.POST)
+        if form.is_valid():
+            pass
+            # check against context
+            # return redirect # next parameter??
+    else:  # GET request
+        form = PollPasswordForm()
 
+    return render(request, 'poll/poll_password.html', {'form': form})
     
