@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Poll
 from django.contrib.auth.hashers import make_password
+from django import forms
 
 # Create your views here.
 
@@ -27,6 +28,7 @@ class PollCreateView(CreateView):
         form.fields['description'].label = 'Description (optional)'
         form.fields['event_location'].label = 'Event Location (optional)'
         form.fields['poll_password'].label = 'Poll Password (optional)'
+        form.fields['poll_password'].widget = forms.PasswordInput()  # mask password on form
         form.fields['poll_password'].help_text = 'Set and share a poll password so only your group can access this poll'
         return form
 
