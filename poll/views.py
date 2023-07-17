@@ -49,7 +49,8 @@ class PollDetailView(DetailView):  # default template is poll/poll_detail.html
     def get(self, request, *args, **kwargs):
         self.object= self.get_object()
         poll_password_hashed = self.object.poll_password
-        entered_password = self.request.session.get('entered_password', "")  # default to ""
+        entered_password_dict = self.request.session.get('entered_password_dict', {})  # default to empty dict
+        entered_password = entered_password_dict.get(self.object.get_absolute_url(), "")  # default to empty str
 
         # redirect if poll has a password but user entered password does not match
         if poll_password_hashed and not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed):
@@ -62,12 +63,24 @@ def poll_password(request):
     if request.method == 'POST':
         form = PollPasswordForm(request.POST)
         if form.is_valid():
-            request.session['entered_password'] = form.cleaned_data['poll_password']
+            
             next_url = request.GET.get('next')
-            if next_url:
-                return redirect(next_url)
-            else:
+            if not next_url:
                 return redirect('poll-home')
+            
+            # entered_password_dict maps next_url to the user-entered poll_password, ie entered_password
+            if 'entered_password_dict' not in request.session:  
+                request.session['entered_password_dict'] = {}
+            request.session['entered_password_dict'][next_url] = form.cleaned_data['poll_password']
+            
+            # explicitly tell Django to save to session database after modification
+            # Django by default only saves to session database after dictionary values have been assigned or deleted
+            # however, we are only mutating a value here
+            # see docs: https://docs.djangoproject.com/en/4.2/topics/http/sessions/#:~:text=When%20sessions%20are%20saved&text=To%20change%20this%20default%20behavior,has%20been%20created%20or%20modified.
+            request.session.save()
+            
+            return redirect(next_url)
+            
             
     else:  # GET request
         form = PollPasswordForm()
