@@ -5,9 +5,9 @@ from django.urls import reverse
 
 class Poll(models.Model):
     title = models.CharField(max_length=100)
-    description = models.TextField(null=True, blank=True)
-    event_location = models.CharField(max_length=2000, null=True, blank=True)
-    poll_password = models.CharField(max_length=64, null=True, blank=True)  # hashed
+    description = models.TextField(blank=True, null=True)
+    event_location = models.CharField(max_length=2000, blank=True, null=True)
+    poll_password = models.CharField(max_length=64, blank=True, null=True)  # hashed
     date_created = models.DateTimeField(default=timezone.now)
     owner_id = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)  # nullable, since Polls do not need an owner
 

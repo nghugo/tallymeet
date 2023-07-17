@@ -202,15 +202,15 @@
       {% block content %} {% endblock content %}
     </section>
 
-    <footer class="relative py-16 bg-white overflow-hidden">
+    <footer class="relative py-10 bg-white overflow-hidden">
       <img
         class="absolute top-0 left-0 h-full"
         src="{% static 'tallymeet/images/footer-gradient.svg' %}"
         alt=""
       />
       <div class="relative z-10 container px-4 mx-auto">
-        <div class="flex justify-between items-center -m-8">
-          <div class="w-auto p-8">
+        <div class="flex flex-col md:flex-row justify-between items-center -m-8">
+          <div class="w-auto p-0 md:p-8">
             <a
               class="max-w-max inline-flex items-center font-bold text-2xl text-gray-900 uppercase tracking-wider"
               href="{% url 'poll-home' %}"
@@ -222,7 +222,7 @@
               /><span class="ml-2">Tallymeet</span>
             </a>
           </div>
-          <div class="w-auto p-8">
+          <div class="w-auto p-0 md:p-8">
             <div class="flex -m-1.5">
               <div class="w-auto p-1.5">
                 <a href="https://github.com/nghugo/tallymeet">

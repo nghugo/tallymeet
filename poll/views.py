@@ -1,8 +1,11 @@
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .models import Poll
-from django.contrib.auth.hashers import make_password
 from django import forms
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from .forms import PollPasswordForm
+
+from .models import Poll
 
 # Create your views here.
 
@@ -15,8 +18,19 @@ def base(request):  # for debugging
 def happy(request):  # for debugging, no inheritance
     return render(request, "poll/happy.html")
 
-# recall default template for class based view: APP/MODEL_VIEWTYPE.html
+def poll_password(request):
+    if request.method == 'POST':
+        form = PollPasswordForm(request.POST)
+        if form.is_valid():
+            pass
+            # do something
+            # return redirect # next parameter??
+    else:  # GET request
+        form = PollPasswordForm()
 
+    return render(request, 'poll/poll_password.html', {'form': form})
+
+# recall default template for class based view: APP/MODEL_VIEWTYPE.html
 class PollCreateView(CreateView):  
     model = Poll
     fields = ['title', 'description', 'event_location', 'poll_password']
@@ -33,11 +47,25 @@ class PollCreateView(CreateView):
         return form
 
     def form_valid(self, form):  # Called when valid form data has been POSTed, returns HttpResponse
-        # hash password before saving
-        poll_password_hashed = make_password(self.request.POST.get('poll_password'))  
-        form.instance.poll_password = poll_password_hashed
+        # if password exists, hash password before saving
+        if self.request.POST.get('poll_password'):
+            poll_password_hashed = make_password(self.request.POST.get('poll_password'))  
+            form.instance.poll_password = poll_password_hashed
         return super().form_valid(form)
 
-class PollDetailView(DetailView):  # default template is poll/poll_detail.html
+class PollDetailView(PermissionRequiredMixin, DetailView):  # default template is poll/poll_detail.html
     model = Poll
+
+    login_url = '/poll/password/'
+    permission_denied_message = 'Poll password required to access this page'
+
+    # def get_context_data(self, *kwargs):
+    #     context = super.get_context_date(**kwargs)
+
+    def has_permission(self):  # this boolean can control 403 forbidden
+        #  return self.request.user.email_confirmed
+        return True
+
+
+
     
