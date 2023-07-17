@@ -37,7 +37,7 @@
 
   </head>
 
-  <body class="min-h-screen flex flex-col">  <!-- flexbox to keep footer at bottom -->
+  <body class="min-h-screen flex flex-col box-border">  <!-- flexbox to keep footer at bottom -->
     <header id="header" class="bg-[#F8FAFC]" x-data="{ open: false }">
       <div class="container mx-auto overflow-hidden">
         <div class="flex items-center justify-between px-4 py-5 bg-[#F8FAFC]">
@@ -65,25 +65,24 @@
               {% block navbar_homepage_ul_links %} {% endblock navbar_homepage_ul_links %}
               
               
-              <!-- navbar log in, register button links for wide screens -->
+              <!-- navbar log in, register links for wide screens -->
               <div class="w-auto hidden lg:block mr-3">
                 <div class="inline-block">
-                  <button
-                    class="py-3 px-5 w-full text-black font-semibold border border-gray-300 rounded-xl focus:ring focus:ring-emerald-300 bg-white hover:bg-gray-100 transition ease-in-out duration-200"
-                    type="button"
+                  <a 
+                    href="#"
+                    class="py-3 px-5 text-center w-full text-black font-semibold border border-gray-300 rounded-xl focus:ring focus:ring-emerald-300 bg-white hover:bg-gray-100 transition ease-in-out duration-200"
                   >
                     Log In
-                  </button>
+                </a>
                 </div>
               </div>
               <div class="w-auto hidden lg:block">
                 <div class="inline-block">
-                  <button
-                    class="py-3 px-5 w-full text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200"
-                    type="button"
+                  <a
+                    class="py-3 px-5 text-center w-full text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200"
                   >
                     Register
-                  </button>
+                </a>
                 </div>
               </div>
               
@@ -173,32 +172,21 @@
                 {% block mobile_ul_list %} {% endblock mobile_ul_list %}
 
               </div>
-              <div class="flex flex-col justify-end w-full pb-8">
+              <div class="flex flex-col justify-end w-full border-box mb-2">
                 
-                <!-- mobile log in, register button links for narrow screens -->
-                <div class="flex flex-wrap">
-                  <div class="w-full">
-                    <div class="block">
-                      <button
-                        class="py-3 px-5 mb-2 w-full text-black font-semibold border border-gray-300 rounded-xl focus:ring focus:ring-emerald-300 bg-white hover:bg-gray-100 transition ease-in-out duration-200"
-                        type="button"
-                      >
-                        Log In
-                      </button>
-                    </div>
-                  </div>
-                  <div class="w-full">
-                    <div class="block">
-                      <button
-                        class="py-3 px-5 w-full text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200"
-                        type="button"
-                      >
-                        Register
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                
+                <!-- mobile log in, register links for narrow screens -->
+                  <a
+                    href="#"
+                    class="py-3 px-5 mb-2 text-center w-full text-black font-semibold border border-gray-300 rounded-xl focus:ring focus:ring-emerald-300 bg-white hover:bg-gray-100 transition ease-in-out duration-200"
+                  >
+                    Log In
+                </a>
+                  <a
+                    href="#"
+                    class="py-3 px-5 w-full text-center text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200"
+                  >
+                    Register
+                </a>
               </div>
             </div>
           </nav>
