@@ -7,6 +7,14 @@ from .models import Poll
 def home(request):
     return render(request, "poll/home.html", {'title': 'Tallymeet'})
 
+def base(request):  # for debugging
+    return render(request, "poll/base.html", {'title': 'BASE TEMPLATE'})
+
+def happy(request):  # for debugging, no inheritance
+    return render(request, "poll/happy.html")
+
+# recall default template for class based view: APP/MODEL_VIEWTYPE.html
+
 class PollCreateView(CreateView):  
     model = Poll
     fields = ['title', 'description', 'event_location', 'poll_password']
@@ -25,10 +33,7 @@ class PollCreateView(CreateView):
     # This method is called when valid form data has been POSTed.
     # It should return an HttpResponse.
         return super().form_valid(form)
+
+class PollDetailView(DetailView):  # default template is poll/poll_detail.html
+    model = Poll
     
-
-def base(request):  # for debugging
-    return render(request, "poll/base.html", {'title': 'BASE TEMPLATE'})
-
-def happy(request):  # for debugging, no inheritance
-    return render(request, "poll/happy.html")
