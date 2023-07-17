@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Poll
+from django.contrib.auth.hashers import make_password
 
 # Create your views here.
 
@@ -29,9 +30,10 @@ class PollCreateView(CreateView):
         form.fields['poll_password'].help_text = 'Set and share a poll password so only your group can access this poll'
         return form
 
-    def form_valid(self, form):
-    # This method is called when valid form data has been POSTed.
-    # It should return an HttpResponse.
+    def form_valid(self, form):  # Called when valid form data has been POSTed, returns HttpResponse
+        # hash password before saving
+        poll_password_hashed = make_password(self.request.POST.get('poll_password'))  
+        form.instance.poll_password = poll_password_hashed
         return super().form_valid(form)
 
 class PollDetailView(DetailView):  # default template is poll/poll_detail.html
