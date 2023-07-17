@@ -7,9 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
     {% if title %}
-    <title>Tallymeet</title>
-    {% else %}
     <title>{{ title }}</title>
+    {% else %}
+    <title>Tallymeet</title>
     {% endif %}
 
     <!-- <link rel="icon" type="image/x-icon" href="/images/schedule64.ico"> -->  <!-- for debugging with VSCode live server -->
@@ -62,7 +62,7 @@
             <div class="flex items-center">
 
               <!-- navbar ul links for wide screens -->
-              {% block navbar_ul_links %} {% endblock navbar_ul_links %}
+              {% block navbar_homepage_ul_links %} {% endblock navbar_homepage_ul_links %}
               
               
               <!-- navbar log in, register button links for wide screens -->
