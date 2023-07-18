@@ -4,9 +4,9 @@ from django import forms
 from django.contrib.auth.hashers import make_password
 from django.urls import reverse
 from passlib.handlers.django import django_pbkdf2_sha256
+from django.contrib import messages
 
 from .forms import PollPasswordForm, PollForm
-
 from .models import Poll
 
 # Create your views here.
@@ -14,11 +14,14 @@ from .models import Poll
 def home(request):
     return render(request, "poll/home.html", {'title': 'Tallymeet'})
 
+
 def base(request):  # for debugging
     return render(request, "poll/base.html", {'title': 'BASE TEMPLATE'})
 
+
 def happy(request):  # for debugging, no inheritance
     return render(request, "poll/happy.html")
+
 
 # recall default template for class based view: APP/MODEL_VIEWTYPE.html
 class PollCreateView(CreateView):  
@@ -39,6 +42,7 @@ class PollCreateView(CreateView):
             form.instance.poll_password = poll_password_hashed
         return super().form_valid(form)
 
+
 class PollDetailView(DetailView):  # default template is poll/poll_detail.html
     model = Poll
 
@@ -58,8 +62,16 @@ class PollDetailView(DetailView):  # default template is poll/poll_detail.html
         entered_password = entered_password_dict[self.object.get_absolute_url()]
 
         # redirect if poll has a password but user entered password does not match
-        if poll_password_hashed and not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed):
-            return redirect(reverse('poll-password') + "?next=" + self.object.get_absolute_url())
+        if poll_password_hashed:
+            # No password provided -> redirect to poll password form
+            # Case: the user did not create the poll, but is trying to log in
+            if not entered_password:
+                return redirect(reverse('poll-password') + "?next=" + self.object.get_absolute_url())
+            # Incorrect password -> flash message AND redirect to poll password form
+            elif not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed):
+                messages.add_message(self.request, messages.ERROR, "Incorrect password")
+                return redirect(reverse('poll-password') + "?next=" + self.object.get_absolute_url())
+        
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 
@@ -72,7 +84,7 @@ def poll_password(request):
             next_url = request.GET.get('next')
             if not next_url:
                 return redirect('poll-home')
-            
+
             # entered_password_dict maps next_url to the user-entered poll_password, ie entered_password
             if 'entered_password_dict' not in request.session:  
                 request.session['entered_password_dict'] = {}
@@ -83,9 +95,7 @@ def poll_password(request):
             # however, we are only mutating a value here
             # see docs: https://docs.djangoproject.com/en/4.2/topics/http/sessions/#:~:text=When%20sessions%20are%20saved&text=To%20change%20this%20default%20behavior,has%20been%20created%20or%20modified.
             request.session.save()
-            
             return redirect(next_url)
-            
             
     else:  # GET request
         form = PollPasswordForm()

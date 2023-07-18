@@ -13,7 +13,7 @@ class PollForm(ModelForm):
     
     title = forms.CharField()
     description = forms.Textarea()  # Textarea does not have label parameter, need to override in views.py
-    event_location = forms.CharField(label="Event Location (optional)", required=False)
+    event_location = forms.CharField(label="Event Location (optional)", required=False, help_text='If your event is video-based, consider putting the link here')
     poll_password = forms.CharField(label="Poll Password (optional)", widget=forms.PasswordInput(), help_text='Set and share a poll password so only your group can access this poll', required=False)
     poll_password_confirm = forms.CharField(label="Confirm Poll Password (if entered above)", widget=forms.PasswordInput(), help_text='Leave blank if a poll password has not been entered above', required=False)
 
