@@ -5,7 +5,7 @@ from django.contrib.auth.hashers import make_password
 from django.urls import reverse
 from passlib.handlers.django import django_pbkdf2_sha256
 
-from .forms import PollPasswordForm
+from .forms import PollPasswordForm, PollForm
 
 from .models import Poll
 
@@ -23,19 +23,14 @@ def happy(request):  # for debugging, no inheritance
 # recall default template for class based view: APP/MODEL_VIEWTYPE.html
 class PollCreateView(CreateView):  
     model = Poll
-    fields = ['title', 'description', 'event_location', 'poll_password']
+    form_class = PollForm
     template_name = 'poll/poll_create.html'  # override default poll_form.html'
-    
-    # change default labels and add help text on form
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        form.fields['description'].label = 'Description (optional)'
-        form.fields['event_location'].label = 'Event Location (optional)'
-        form.fields['poll_password'].label = 'Poll Password (optional)'
-        form.fields['poll_password'].widget = forms.PasswordInput()  # mask password on form
-        form.fields['poll_password'].help_text = 'Set and share a poll password so only your group can access this poll'
-        return form
 
+    def get_form(self, form_class = PollForm):
+        form = super().get_form(form_class)
+        form.fields['description'].label = "Description (optional)"
+        return form
+    
     def form_valid(self, form):  # Called when valid form data has been POSTed, returns HttpResponse
         # if password exists, hash password before saving
         if self.request.POST.get('poll_password'):

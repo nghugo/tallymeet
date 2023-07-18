@@ -1,9 +1,9 @@
 {% extends "poll/base.html" %}
 {% load static %}
-{% load tailwind_filters %}
+{% load crispy_forms_tags %}
 {% block content %}
     <div class="container px-4 my-4 mx-auto">
-        <form method="post">
+        <form method="post" novalidate>
             {% csrf_token %}
             <fieldset class="form-group">
                 <legend class="mb-6 text-3xl md:text-4xl lg:max-xl:text-3xl font-bold font-heading leading-none text-center md:text-left">
