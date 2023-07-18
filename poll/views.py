@@ -51,17 +51,13 @@ class PollDetailView(DetailView):  # default template is poll/poll_detail.html
         poll_password_hashed = self.object.poll_password
         id = str(self.object.__hash__())
         entered_password_dict = self.request.session.get('entered_password_dict', {})
-
-        # most recent password purpose -> so user does not have to re-enter password immediately after poll creation
-        if id not in entered_password_dict:  # if password for path does not exist
-
-            if 'most_recent_poll_password' in self.request.session:  # use most recent password if it exists
-                entered_password_dict[id] = self.request.session['most_recent_poll_password']
-                del self.request.session['most_recent_poll_password']  # delete most recent password once used
-            else:  # else use empty string
-                entered_password_dict[id] = ""
-
-        entered_password = entered_password_dict[id]
+        
+        # most recent password purpose -> so user does not have to re-enter password immediately after poll creation/ password update
+        if 'most_recent_poll_password' in self.request.session:  # use most recent password if it exists
+            entered_password_dict[id] = self.request.session['most_recent_poll_password']
+            del self.request.session['most_recent_poll_password']  # delete most recent password once used
+        
+        entered_password = entered_password_dict.get(id, None)
 
         # redirect if poll has a password but user entered password does not match
         if poll_password_hashed:
@@ -112,7 +108,6 @@ class PollUpdateView(UpdateView):
 
 class PollUpdatePasswordView(UpdateView):
     model = Poll
-    # fields = ['poll_password']
     form_class = PollUpdatePasswordForm
     template_name = 'poll/poll_update.html'  # override default poll_form.html'
 
@@ -125,7 +120,7 @@ class PollUpdatePasswordView(UpdateView):
         entered_password = entered_password_dict.get(id, "")
 
         # redirect if poll has a password but user entered password does not match
-        if poll_password_hashed:
+        if poll_password_hashed:  # if there exists a poll password
             # No password provided -> redirect to poll password form
             # Case: the user did not create the poll, but is trying to log in
             if not entered_password:
@@ -139,10 +134,13 @@ class PollUpdatePasswordView(UpdateView):
         return self.render_to_response(context)
 
     def form_valid(self, form):  # Called when valid form data has been POSTed, returns HttpResponse
-        # if use provided a poll password, add to session object, and hash it before saving to database
-        if self.request.POST.get('poll_password'):
-            self.request.session['most_recent_poll_password'] = self.request.POST.get('poll_password')  # most_recent_poll_password purpose -> do not have to re-entere when redirected to details
-            poll_password_hashed = make_password(self.request.POST.get('poll_password'))  
+        # if the user provided a new password for the poll, add to session object, and hash it before saving to database
+        new_poll_password = self.request.POST.get('poll_password')
+        if new_poll_password:
+            self.request.session['most_recent_poll_password'] = new_poll_password  # most_recent_poll_password purpose -> do not have to re-entere when redirected to details
+            poll_password_hashed = make_password(new_poll_password)  
+            print(f"new password saved as {self.request.session['most_recent_poll_password']}")
+            print(f"entered password as {form.cleaned_data['poll_password']}")
             form.instance.poll_password = poll_password_hashed
         return super().form_valid(form)
 

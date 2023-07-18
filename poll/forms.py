@@ -32,8 +32,8 @@ class PollUpdatePasswordForm(ModelForm):
         model = Poll
         fields = ["poll_password"]
     
-    poll_password = forms.CharField(label="Poll Password (optional)", widget=forms.PasswordInput(), help_text='Update the poll password so only your group can access this poll', required=False)
-    poll_password_confirm = forms.CharField(label="Confirm Poll Password (if entered above)", widget=forms.PasswordInput(), help_text='Please leave blank if a poll password has not been entered above', required=False)
+    poll_password = forms.CharField(label="New Poll Password (optional)", widget=forms.PasswordInput(), help_text='Update the poll password so only your group can access this poll', required=False)
+    poll_password_confirm = forms.CharField(label="Confirm New Poll Password (if entered above)", widget=forms.PasswordInput(), help_text='Please leave blank if a poll password has not been entered above', required=False)
 
     def clean(self):
         cleaned_data = super().clean()
