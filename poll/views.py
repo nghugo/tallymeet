@@ -26,14 +26,15 @@ class PollCreateView(CreateView):
     form_class = PollForm
     template_name = 'poll/poll_create.html'  # override default poll_form.html'
 
-    def get_form(self, form_class = PollForm):
+    def get_form(self, form_class = PollForm):  # just to override a label here
         form = super().get_form(form_class)
         form.fields['description'].label = "Description (optional)"
         return form
     
     def form_valid(self, form):  # Called when valid form data has been POSTed, returns HttpResponse
-        # if password exists, hash password before saving
+        # if use provided a poll password, add to session object, and hash it before saving to database
         if self.request.POST.get('poll_password'):
+            self.request.session['most_recent_poll_password'] = self.request.POST.get('poll_password')
             poll_password_hashed = make_password(self.request.POST.get('poll_password'))  
             form.instance.poll_password = poll_password_hashed
         return super().form_valid(form)
@@ -44,8 +45,17 @@ class PollDetailView(DetailView):  # default template is poll/poll_detail.html
     def get(self, request, *args, **kwargs):
         self.object= self.get_object()
         poll_password_hashed = self.object.poll_password
-        entered_password_dict = self.request.session.get('entered_password_dict', {})  # default to empty dict
-        entered_password = entered_password_dict.get(self.object.get_absolute_url(), "")  # default to empty str
+        
+        entered_password_dict = self.request.session.get('entered_password_dict', {})
+
+        # most recent password purpose -> so user does not have to re-enter password immediately after poll creation
+        if self.object.get_absolute_url() not in entered_password_dict:  # if password for path does not exist
+            if 'most_recent_poll_password' in self.request.session:  # use most recent password if it exists
+                entered_password_dict[self.object.get_absolute_url()] = self.request.session['most_recent_poll_password']
+                del self.request.session['most_recent_poll_password']  # delete most recent password once used
+            else:  # else use empty string
+                entered_password_dict[self.object.get_absolute_url()] = ""
+        entered_password = entered_password_dict[self.object.get_absolute_url()]
 
         # redirect if poll has a password but user entered password does not match
         if poll_password_hashed and not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed):

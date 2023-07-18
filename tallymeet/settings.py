@@ -34,7 +34,6 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     "poll.apps.PollConfig",
     "crispy_forms",
-    # "crispy_bootstrap4",
     "crispy_tailwind",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -128,7 +127,3 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Crispy Forms with Tailwind
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 CRISPY_TEMPLATE_PACK = "tailwind"
-
-# # Crispy Forms with Bootstrap
-# CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
-# CRISPY_TEMPLATE_PACK = "bootstrap4"
