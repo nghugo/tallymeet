@@ -37,7 +37,7 @@ class PollCreateView(CreateView):
     def form_valid(self, form):  # Called when valid form data has been POSTed, returns HttpResponse
         # if use provided a poll password, add to session object, and hash it before saving to database
         if self.request.POST.get('poll_password'):
-            self.request.session['most_recent_poll_password'] = self.request.POST.get('poll_password')  # most_recent_poll_password purpose -> do not have to re-entere when redirected to details
+            self.request.session['pollPasswordAtPollCreation'] = self.request.POST.get('poll_password')  # pollPasswordAtPollCreation purpose -> do not have to re-entere when redirected to details
             poll_password_hashed = make_password(self.request.POST.get('poll_password'))  
             form.instance.poll_password = poll_password_hashed
         return super().form_valid(form)
@@ -49,21 +49,19 @@ def getEnteredPassword(requestSession, id):
         Objective: return the latest correct poll password the user provided for a poll id
         -------------------------------------------------------------------
         Priorities:
-        1. returns self.request.session['most_recent_poll_password'] if exists
+        1. returns self.request.session['pollPasswordAtPollCreation'] if exists
             (most recent password is set after creating poll or updating poll password)
-            (should remove this in future updates)
+            (needed because the object (hence its id) would not have been created by that point)
+            (so we can't set requestSession['entered_password_dict'][id] yet)
         2. else returns requestSession['entered_password_dict'][id] if exists
             (represents the latest correct poll password the user provided for a poll id)
         3. else returns empty string ("") 
             (represents None, we redirect but do not flash the "wrong password" message)
     """
-    
     entered_password_dict = requestSession.get('entered_password_dict', {})
-    
-    # most recent password -> so user does not have to re-enter immediately after poll creation/ password update
-    if 'most_recent_poll_password' in requestSession:
-        entered_password_dict[id] = requestSession['most_recent_poll_password']
-        del requestSession['most_recent_poll_password']  # delete most recent password once used
+    if 'pollPasswordAtPollCreation' in requestSession:
+        entered_password_dict[id] = requestSession['pollPasswordAtPollCreation']
+        del requestSession['pollPasswordAtPollCreation']  # delete most recent password once used
     entered_password = entered_password_dict.get(id, "")
     return entered_password
 
@@ -75,6 +73,11 @@ class PollDetailView(DetailView):  # default template is poll/poll_detail.html
         poll_password_hashed = self.object.poll_password
         id = str(self.object.__hash__())
         entered_password = getEnteredPassword(self.request.session, id)
+        
+        # DEBUG
+        print(entered_password)
+        print(django_pbkdf2_sha256.verify(entered_password, poll_password_hashed))
+
 
         # if poll has a password and the user provided password does not exist or does not match -> redirect to password verification
         # add a flash message in the does not match case
@@ -137,20 +140,26 @@ class PollUpdatePasswordView(UpdateView):
             elif not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed):
                 messages.add_message(self.request, messages.ERROR, "Incorrect password")
                 return redirect(reverse('poll-password') + "?hashid=" + str(id) + "&next=" + self.object.get_absolute_url())
-        
+                
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 
     def form_valid(self, form):  # Called when valid form data has been POSTed, returns HttpResponse
         # if the user provided a new password for the poll, add to session object, and hash it before saving to database
         new_poll_password = self.request.POST.get('poll_password')
-        if new_poll_password:
-            self.request.session['most_recent_poll_password'] = new_poll_password  # most_recent_poll_password purpose -> do not have to re-enter when redirected to details
-            poll_password_hashed = make_password(new_poll_password)  
-            print(f"new password saved as {self.request.session['most_recent_poll_password']}")
-            print(f"entered password as {form.cleaned_data['poll_password']}")
-            form.instance.poll_password = poll_password_hashed
-        return super().form_valid(form)
+        
+        if not new_poll_password:
+            return super().form_valid(form)
+        else:
+            if super().form_valid(form):  # if form is valid, save the new password to the session object and db (hashed then handled by ModelForm)
+                id = str(self.object.__hash__())
+                self.request.session['entered_password_dict'][id] = new_poll_password
+                # explicit save -> by default, Django does not save to session DB after mutation, only addition or deletion of values
+            # see docs: https://docs.djangoproject.com/en/4.2/topics/http/sessions/#:~:text=When%20sessions%20are%20saved&text=To%20change%20this%20default%20behavior,has%20been%20created%20or%20modified.
+                self.request.session.save()
+                poll_password_hashed = make_password(new_poll_password)  
+                form.instance.poll_password = poll_password_hashed
+            return super().form_valid(form)
 
     def get_context_data(self, **kwargs):  # pass extra context to template
         context = super().get_context_data(**kwargs)
@@ -169,9 +178,7 @@ def poll_verify_password(request):
             if 'entered_password_dict' not in request.session:  
                 request.session['entered_password_dict'] = {}
             request.session['entered_password_dict'][hash_id] = form.cleaned_data['poll_password']
-            # explicitly tell Django to save to session database after modification
-            # Django by default only saves to session database after dictionary values have been assigned or deleted
-            # however, we are only mutating a value here
+            # explicit save -> by default, Django does not save to session DB after mutation, only addition or deletion of values
             # see docs: https://docs.djangoproject.com/en/4.2/topics/http/sessions/#:~:text=When%20sessions%20are%20saved&text=To%20change%20this%20default%20behavior,has%20been%20created%20or%20modified.
             request.session.save()
             return redirect(next_url)
