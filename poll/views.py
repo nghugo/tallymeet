@@ -42,6 +42,30 @@ class PollCreateView(CreateView):
             form.instance.poll_password = poll_password_hashed
         return super().form_valid(form)
 
+# getUserEnteredPollPasswordForId
+
+def getEnteredPassword(requestSession, id):
+    """ 
+        Objective: return the latest correct poll password the user provided for a poll id
+        -------------------------------------------------------------------
+        Priorities:
+        1. returns self.request.session['most_recent_poll_password'] if exists
+            (most recent password is set after creating poll or updating poll password)
+            (should remove this in future updates)
+        2. else returns requestSession['entered_password_dict'][id] if exists
+            (represents the latest correct poll password the user provided for a poll id)
+        3. else returns empty string ("") 
+            (represents None, we redirect but do not flash the "wrong password" message)
+    """
+    
+    entered_password_dict = requestSession.get('entered_password_dict', {})
+    
+    # most recent password -> so user does not have to re-enter immediately after poll creation/ password update
+    if 'most_recent_poll_password' in requestSession:
+        entered_password_dict[id] = requestSession['most_recent_poll_password']
+        del requestSession['most_recent_poll_password']  # delete most recent password once used
+    entered_password = entered_password_dict.get(id, "")
+    return entered_password
 
 class PollDetailView(DetailView):  # default template is poll/poll_detail.html
     model = Poll
@@ -50,24 +74,14 @@ class PollDetailView(DetailView):  # default template is poll/poll_detail.html
         self.object= self.get_object()
         poll_password_hashed = self.object.poll_password
         id = str(self.object.__hash__())
-        entered_password_dict = self.request.session.get('entered_password_dict', {})
-        
-        # most recent password purpose -> so user does not have to re-enter password immediately after poll creation/ password update
-        if 'most_recent_poll_password' in self.request.session:  # use most recent password if it exists
-            entered_password_dict[id] = self.request.session['most_recent_poll_password']
-            del self.request.session['most_recent_poll_password']  # delete most recent password once used
-        
-        entered_password = entered_password_dict.get(id, None)
+        entered_password = getEnteredPassword(self.request.session, id)
 
-        # redirect if poll has a password but user entered password does not match
+        # if poll has a password and the user provided password does not exist or does not match -> redirect to password verification
+        # add a flash message in the does not match case
         if poll_password_hashed:
-            # No password provided -> redirect to poll password form
-            # Case: the user did not create the poll, but is trying to log in
             if not entered_password:
                 return redirect(reverse('poll-password') + "?hashid=" + str(id) + "&next=" + self.object.get_absolute_url())
-            # Incorrect password -> flash message AND redirect to poll password form
             elif not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed):
-                
                 messages.add_message(self.request, messages.ERROR, "Incorrect password")
                 return redirect(reverse('poll-password') + "?hashid=" + str(id) + "&next=" + self.object.get_absolute_url())
             
@@ -84,16 +98,13 @@ class PollUpdateView(UpdateView):
         poll_password_hashed = self.object.poll_password
         id = str(self.object.__hash__())
         
-        entered_password_dict = self.request.session.get('entered_password_dict', {})
-        entered_password = entered_password_dict.get(id, "")
+        entered_password = getEnteredPassword(self.request.session, id)
 
-        # redirect if poll has a password but user entered password does not match
+        # if poll has a password and the user provided password does not exist or does not match -> redirect to password verification
+        # add a flash message in the does not match case
         if poll_password_hashed:
-            # No password provided -> redirect to poll password form
-            # Case: the user did not create the poll, but is trying to log in
             if not entered_password:
                 return redirect(reverse('poll-password') + "?hashid=" + str(id) + "&next=" + self.object.get_absolute_url())
-            # Incorrect password -> flash message AND redirect to poll password form
             elif not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed):
                 messages.add_message(self.request, messages.ERROR, "Incorrect password")
                 return redirect(reverse('poll-password') + "?hashid=" + str(id) + "&next=" + self.object.get_absolute_url())
@@ -116,16 +127,13 @@ class PollUpdatePasswordView(UpdateView):
         poll_password_hashed = self.object.poll_password
         id = str(self.object.__hash__())
         
-        entered_password_dict = self.request.session.get('entered_password_dict', {})
-        entered_password = entered_password_dict.get(id, "")
+        entered_password = getEnteredPassword(self.request.session, id)
 
-        # redirect if poll has a password but user entered password does not match
-        if poll_password_hashed:  # if there exists a poll password
-            # No password provided -> redirect to poll password form
-            # Case: the user did not create the poll, but is trying to log in
+        # if poll has a password and the user provided password does not exist or does not match -> redirect to password verification
+        # add a flash message in the does not match case
+        if poll_password_hashed:
             if not entered_password:
                 return redirect(reverse('poll-password') + "?hashid=" + str(id) + "&next=" + self.object.get_absolute_url())
-            # Incorrect password -> flash message AND redirect to poll password form
             elif not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed):
                 messages.add_message(self.request, messages.ERROR, "Incorrect password")
                 return redirect(reverse('poll-password') + "?hashid=" + str(id) + "&next=" + self.object.get_absolute_url())
@@ -137,7 +145,7 @@ class PollUpdatePasswordView(UpdateView):
         # if the user provided a new password for the poll, add to session object, and hash it before saving to database
         new_poll_password = self.request.POST.get('poll_password')
         if new_poll_password:
-            self.request.session['most_recent_poll_password'] = new_poll_password  # most_recent_poll_password purpose -> do not have to re-entere when redirected to details
+            self.request.session['most_recent_poll_password'] = new_poll_password  # most_recent_poll_password purpose -> do not have to re-enter when redirected to details
             poll_password_hashed = make_password(new_poll_password)  
             print(f"new password saved as {self.request.session['most_recent_poll_password']}")
             print(f"entered password as {form.cleaned_data['poll_password']}")
@@ -149,7 +157,7 @@ class PollUpdatePasswordView(UpdateView):
         context["subheading"] = "Password"
         return context
 
-def poll_password(request):
+def poll_verify_password(request):
     if request.method == 'POST':
         form = PollPasswordForm(request.POST)
         if form.is_valid():
