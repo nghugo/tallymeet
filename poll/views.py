@@ -75,6 +75,12 @@ class PollDetailView(DetailView):  # default template is poll/poll_detail.html
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 
+class PollUpdateView(UpdateView):
+    model = Poll
+    fields = ['title', 'description', 'event_location']
+    template_name = 'poll/poll_update.html'  # override default poll_form.html'
+
+
 
 def poll_password(request):
     if request.method == 'POST':
