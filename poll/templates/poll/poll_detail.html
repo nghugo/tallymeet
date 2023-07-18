@@ -56,8 +56,9 @@
         </div>
             
         <div class="mb-6 flex justify-end">
-            <a href="#" class="block py-4 px-6 w-min ml-4 text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200">Update</a>
-            <a href="#" class="block py-4 px-6 w-min sm:max-w-min ml-4 text-white font-semibold border border-red-700 rounded-xl focus:ring focus:ring-red-300 bg-red-600 hover:bg-red-700 transition ease-in-out duration-200">Delete</a>
+            <a href="{% url 'poll-update' object.id %}" class="block py-4 px-6 w-min ml-4 text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200">Update</a>
+            <a href="{% url 'poll-update-password' object.id %}" class="block py-4 px-6 w-min ml-4 text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200">Update Password</a>
+            <a href="{% url 'poll-delete' object.id %}" class="block py-4 px-6 w-min sm:max-w-min ml-4 text-white font-semibold border border-red-700 rounded-xl focus:ring focus:ring-red-300 bg-red-600 hover:bg-red-700 transition ease-in-out duration-200">Delete</a>
         </div>
     </div>
 {% endblock content %}
