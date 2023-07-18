@@ -1,8 +1,7 @@
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django import forms
 from django.contrib.auth.hashers import make_password
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from passlib.handlers.django import django_pbkdf2_sha256
 from django.contrib import messages
 
@@ -74,13 +73,8 @@ class PollDetailView(DetailView):  # default template is poll/poll_detail.html
         id = str(self.object.__hash__())
         entered_password = getEnteredPassword(self.request.session, id)
         
-        # DEBUG
-        print(entered_password)
-        print(django_pbkdf2_sha256.verify(entered_password, poll_password_hashed))
-
-
-        # if poll has a password and the user provided password does not exist or does not match -> redirect to password verification
-        # add a flash message in the does not match case
+        # if poll has a password and the user-provided-password does not exist or does not match -> redirect to password verification
+        # in the "does not match" case, also show a flash message for user feedback
         if poll_password_hashed:
             if not entered_password:
                 return redirect(reverse('poll-password') + "?hashid=" + str(id) + "&next=" + self.object.get_absolute_url())
@@ -100,11 +94,10 @@ class PollUpdateView(UpdateView):
         self.object= self.get_object()
         poll_password_hashed = self.object.poll_password
         id = str(self.object.__hash__())
-        
         entered_password = getEnteredPassword(self.request.session, id)
 
-        # if poll has a password and the user provided password does not exist or does not match -> redirect to password verification
-        # add a flash message in the does not match case
+        # if poll has a password and the user-provided-password does not exist or does not match -> redirect to password verification
+        # in the "does not match" case, also show a flash message for user feedback
         if poll_password_hashed:
             if not entered_password:
                 return redirect(reverse('poll-password') + "?hashid=" + str(id) + "&next=" + self.object.get_absolute_url())
@@ -120,20 +113,25 @@ class PollUpdateView(UpdateView):
         context["subheading"] = "Info"
         return context
 
+    def get_form(self, form_class = None):  # just to override a label here
+        form = super().get_form(form_class)
+        form.fields['description'].label = "Description (optional)"
+        form.fields['event_location'].label = "Event Location (optional)"
+        return form
+
 class PollUpdatePasswordView(UpdateView):
     model = Poll
     form_class = PollUpdatePasswordForm
-    template_name = 'poll/poll_update.html'  # override default poll_form.html'
+    template_name = 'poll/poll_update.html'
 
     def get(self, request, *args, **kwargs):
         self.object= self.get_object()
         poll_password_hashed = self.object.poll_password
         id = str(self.object.__hash__())
-        
         entered_password = getEnteredPassword(self.request.session, id)
 
-        # if poll has a password and the user provided password does not exist or does not match -> redirect to password verification
-        # add a flash message in the does not match case
+        # if poll has a password and the user-provided-password does not exist or does not match -> redirect to password verification
+        # in the "does not match" case, also show a flash message for user feedback
         if poll_password_hashed:
             if not entered_password:
                 return redirect(reverse('poll-password') + "?hashid=" + str(id) + "&next=" + self.object.get_absolute_url())
@@ -188,4 +186,26 @@ def poll_verify_password(request):
 
 
 class PollDeleteView(DeleteView):
-    pass
+    model = Poll
+    success_url = reverse_lazy('poll-home')  # reverse cannot be used with success_url -> use reverse_lazy
+    # success_url = "/"
+    # default template is 'poll/poll_confirm_delete.html'
+
+    def get(self, request, *args, **kwargs):
+        self.object= self.get_object()
+        poll_password_hashed = self.object.poll_password
+        id = str(self.object.__hash__())
+        entered_password = getEnteredPassword(self.request.session, id)
+
+        # if poll has a password and the user-provided-password does not exist or does not match -> redirect to password verification
+        # in the "does not match" case, also show a flash message for user feedback
+        if poll_password_hashed:
+            if not entered_password:
+                return redirect(reverse('poll-password') + "?hashid=" + str(id) + "&next=" + self.object.get_absolute_url())
+            elif not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed):
+                messages.add_message(self.request, messages.ERROR, "Incorrect password")
+                return redirect(reverse('poll-password') + "?hashid=" + str(id) + "&next=" + self.object.get_absolute_url())
+                
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
+
