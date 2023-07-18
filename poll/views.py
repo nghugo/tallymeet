@@ -105,6 +105,11 @@ class PollUpdateView(UpdateView):
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["subheading"] = "Info"
+        return context
+
 class PollUpdatePasswordView(UpdateView):
     model = Poll
     # fields = ['poll_password']
@@ -140,6 +145,11 @@ class PollUpdatePasswordView(UpdateView):
             poll_password_hashed = make_password(self.request.POST.get('poll_password'))  
             form.instance.poll_password = poll_password_hashed
         return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):  # pass extra context to template
+        context = super().get_context_data(**kwargs)
+        context["subheading"] = "Password"
+        return context
 
 def poll_password(request):
     if request.method == 'POST':

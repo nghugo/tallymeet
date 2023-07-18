@@ -3,65 +3,6 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-
-    {% comment %} <!-- Original -->
-    <div class="container px-4 my-4 mx-auto">
-
-        <h1 class="mb-6 text-3xl md:text-4xl lg:max-xl:text-3xl font-bold font-heading leading-none text-center md:text-left">Poll Details</h1>
-
-        <div class="mb-6">
-            <div class="py-4 flex flex-col md:flex-row bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                <p class=" pb-1 min-w-[20%] font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    Title
-                </p>
-                <p class="">
-                    {{object.title}}
-                </p>
-            </div>
-
-            <div class="py-4 flex flex-col md:flex-row bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                <p class=" pb-1 min-w-[20%] font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    Description
-                </p>
-                <p class="">
-                    {{object.description}}
-                </p>
-            </div>
-            
-            <div class="py-4 flex flex-col md:flex-row bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                <p class=" pb-1 min-w-[20%] font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    Event Location
-                </p>
-                <p class="">
-                    {{object.event_location}}
-                </p>
-            </div>
-
-            <div class="py-4 flex flex-col md:flex-row bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                <p class=" pb-1 min-w-[20%] font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    Date Created
-                </p>
-                <p class="">
-                    {{object.date_created}}
-                </p>
-            </div>
-
-            <div class="py-4 flex flex-col md:flex-row bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                <p class=" pb-1 min-w-[20%] font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    Poll Owner
-                </p>
-                <p class="">
-                    {{object.owner_id}}
-                </p>
-            </div>
-
-        </div>
-            
-        <div class="mb-6 flex justify-end">
-            <a href="#" class="block py-4 px-6 w-min ml-4 text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200">Update</a>
-            <a href="#" class="block py-4 px-6 w-min sm:max-w-min ml-4 text-white font-semibold border border-red-700 rounded-xl focus:ring focus:ring-red-300 bg-red-600 hover:bg-red-700 transition ease-in-out duration-200">Delete</a>
-        </div>
-    </div> {% endcomment %}
     
     <!-- Update -->
     <div class="container px-4 my-4 mx-auto">
@@ -69,7 +10,12 @@
             {% csrf_token %}
             <fieldset class="form-group">
                 <legend class="mb-6 text-3xl md:text-4xl lg:max-xl:text-3xl font-bold font-heading leading-none text-center md:text-left">
+                    {% if subheading %}
+                    Update a Poll - {{ subheading }}
+                    {% else %}
                     Update a Poll
+                    {% endif %}
+
                 </legend>
                 {{ form|crispy }}
             </fieldset>
