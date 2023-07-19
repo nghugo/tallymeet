@@ -9,21 +9,23 @@ from .forms import PollOptionCreateForm, PollOptionCreateFormSet
 from .models import PollOption
 from poll.models import Poll
 
-# Create your views here.
+
 class PollOptionCreateView(CreateView):
     model = PollOption
     form_class = PollOptionCreateForm
     template_name = 'polloption/polloption_create.html'  # override default polloption/polloption_form.html'
     
-    # FORMSET
+    def get_initial(self):
+        return {'poll_id':Poll.objects.get(pk=self.request.GET.get('poll_id'))}
+
+    # # # # # #
+    # Formset #
+    # # # # # #
 
     # def get_context_data(self, **kwargs):  # pass extra context to template
     #     context = super().get_context_data(**kwargs)
     #     context["PollOptionCreateFormSet"] = PollOptionCreateFormSet
     #     return context
-    
-    def get_initial(self):
-        return {'poll_id':Poll.objects.get(pk=self.request.GET.get('poll_id'))}
     
     def form_valid(self, form):  # Called when valid form data has been POSTed, returns HttpResponse
         """ Set poll_id as final field entry again, to prevent tampering """
@@ -31,17 +33,17 @@ class PollOptionCreateView(CreateView):
         return super().form_valid(form)
     
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
-#  use form_valid to validate against poll password #
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
+    # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    #  use form_valid to validate against poll password #
+    # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-#     def form_valid(self, form):  # Called when valid form data has been POSTed, returns HttpResponse
-#         # if use provided a poll password, add to session object, and hash it before saving to database
-#         if self.request.POST.get('poll_password'):
-#             self.request.session['pollPasswordAtPollCreation'] = self.request.POST.get('poll_password')  # pollPasswordAtPollCreation purpose -> do not have to re-enter when redirected to details
-#             poll_password_hashed = make_password(self.request.POST.get('poll_password'))  
-#             form.instance.poll_password = poll_password_hashed
-#         return super().form_valid(form)
+    #     def form_valid(self, form):  # Called when valid form data has been POSTed, returns HttpResponse
+    #         # if use provided a poll password, add to session object, and hash it before saving to database
+    #         if self.request.POST.get('poll_password'):
+    #             self.request.session['pollPasswordAtPollCreation'] = self.request.POST.get('poll_password')  # pollPasswordAtPollCreation purpose -> do not have to re-enter when redirected to details
+    #             poll_password_hashed = make_password(self.request.POST.get('poll_password'))  
+    #             form.instance.poll_password = poll_password_hashed
+    #         return super().form_valid(form)
 
 class PollOptionDetailView(DetailView):
     model = PollOption

@@ -5,7 +5,7 @@ from .models import PollOption
 from poll.models import Poll
 
 
-class PollOptionCreateForm(ModelForm):            
+class PollOptionCreateForm(ModelForm):
     class Meta:
         model = PollOption
         fields = ["poll_id", "event_start_time", "event_end_time"]
@@ -19,8 +19,8 @@ class PollOptionCreateForm(ModelForm):
     
     queryset = Poll.objects.all()  # MODIFY TO CONTROL POLL PASSWORD BASED PERMISSIONS
 
-    poll_id = forms.ModelChoiceField(queryset = queryset)
-    # poll_id = forms.ModelChoiceField(queryset = queryset, widget = forms.HiddenInput())
+    poll_id = forms.ModelChoiceField(queryset = queryset, disabled=True)  # disabled=True keeps the initial value in form, and prevents tampering
+    # poll_id = forms.ModelChoiceField(queryset = queryset, disabled=True, widget = forms.HiddenInput())
 
     def clean(self):
         cleaned_data = super().clean()
