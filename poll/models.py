@@ -23,13 +23,13 @@ class Poll(models.Model):
 #     response = models.CharField(max_length=8)
 
 #     def __str__(self):
-#         return (self.responder_id, self.poll_option_id)
+#         return ''.join([str(self.responder_id), str(self.poll_option_id)])
 
 # class PollResponderXref(models.Model):
 #     responder_id = models.ForeignKey(User, on_delete=models.CASCADE)
 #     poll_id = models.ForeignKey(PollOption, on_delete=models.CASCADE)
     
 #     def __str__(self):
-#         return (self.responder_id, self.poll_id)
+#         return ''.join([str(self.responder_id), str(self.poll_id)])
 
 

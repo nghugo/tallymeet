@@ -36,15 +36,14 @@ class PollCreateView(CreateView):
     def form_valid(self, form):  # Called when valid form data has been POSTed, returns HttpResponse
         # if use provided a poll password, add to session object, and hash it before saving to database
         if self.request.POST.get('poll_password'):
-            self.request.session['pollPasswordAtPollCreation'] = self.request.POST.get('poll_password')  # pollPasswordAtPollCreation purpose -> do not have to re-entere when redirected to details
+            self.request.session['pollPasswordAtPollCreation'] = self.request.POST.get('poll_password')  # pollPasswordAtPollCreation purpose -> do not have to re-enter when redirected to details
             poll_password_hashed = make_password(self.request.POST.get('poll_password'))  
             form.instance.poll_password = poll_password_hashed
         return super().form_valid(form)
     
 
 def getEnteredPassword(requestSession, id):
-    """ 
-        Objective: return the latest correct poll password the user provided for a poll id
+    """ Objective: return the latest correct poll password the user provided for a poll id
         -------------------------------------------------------------------
         Priorities:
         1. returns self.request.session['pollPasswordAtPollCreation'] if exists
@@ -54,8 +53,8 @@ def getEnteredPassword(requestSession, id):
         2. else returns requestSession['entered_password_dict'][id] if exists
             (represents the latest correct poll password the user provided for a poll id)
         3. else returns empty string ("") 
-            (represents None, we redirect but do not flash the "wrong password" message)
-    """
+            (represents None, we redirect but do not flash the "wrong password" message) """
+    
     entered_password_dict = requestSession.get('entered_password_dict', {})
     if 'pollPasswordAtPollCreation' in requestSession:
         entered_password_dict[id] = requestSession['pollPasswordAtPollCreation']  # mutate entered_password_dict to save the new password into the session object

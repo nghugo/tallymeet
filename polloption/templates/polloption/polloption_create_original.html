@@ -7,10 +7,16 @@
         <form method="post" novalidate>
             {% csrf_token %}
             <h1 class="mb-6 text-3xl md:text-4xl lg:max-xl:text-3xl font-bold font-heading leading-none text-center md:text-left">
-                Create Poll Options (test)
+                Create Poll Options
             </h1>
             <div class="flex flex-col max-w-lg">
-                {{ form|crispy }}
+                {% for form in PollOptionCreateFormSet %}
+                {% csrf_token %}
+                <fieldset class="border border-slate-300 rounded p-2 my-2 mx-auto max-w-min sm:max-w-none sm:w-full">
+                    {% comment %} {{ form|crispy }} {% endcomment %}
+                    {{ form }}
+                </fieldset>
+            {% endfor %}
             </div>
             
             <div class="flex flex-col sm:flex-row flex-wrap justify-center sm:justify-end items-center px-4">
@@ -19,6 +25,4 @@
             </div>
         </form>
     </div>
-    {{ form.errors }}
-    {{ form.non_field_errors }}
 {% endblock content %}

@@ -2,9 +2,10 @@ from django import forms
 from django.forms import ModelForm
 from django.core.exceptions import ValidationError
 from .models import PollOption
+from poll.models import Poll
 
 
-class PollOptionCreateForm(ModelForm):
+class PollOptionCreateForm(ModelForm):            
     class Meta:
         model = PollOption
         fields = ["poll_id", "event_start_time", "event_end_time"]
@@ -16,9 +17,10 @@ class PollOptionCreateForm(ModelForm):
             'event_end_time':  forms.DateTimeInput(attrs={'type': 'datetime-local'})     
         }
     
-    queryset = PollOption.objects.all()  # MODIFY TO CONTROL POLL PASSWORD BASED PERMISSIONS
+    queryset = Poll.objects.all()  # MODIFY TO CONTROL POLL PASSWORD BASED PERMISSIONS
 
-    poll_id = forms.ModelChoiceField(queryset = queryset, widget = forms.HiddenInput())
+    poll_id = forms.ModelChoiceField(queryset = queryset)
+    # poll_id = forms.ModelChoiceField(queryset = queryset, widget = forms.HiddenInput())
 
     def clean(self):
         cleaned_data = super().clean()
@@ -36,5 +38,5 @@ class PollOptionCreateForm(ModelForm):
 
 # Use a formset to repeat PollOptionCreateForm
 
-PollOptionCreateFormSet = forms.formset_factory(PollOptionCreateForm, extra=5)
+PollOptionCreateFormSet = forms.formset_factory(PollOptionCreateForm, extra=2)
 # using initial data with formset https://docs.djangoproject.com/en/4.2/topics/forms/formsets/#using-initial-data-with-a-formset
