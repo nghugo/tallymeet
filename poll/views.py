@@ -22,7 +22,7 @@ def happy(request):  # for debugging, no inheritance
     return render(request, "poll/happy.html")
 
 
-# recall default template for class based view: APP/MODEL_VIEWTYPE.html
+# default template for class based view: APP/MODEL_VIEWTYPE.html
 class PollCreateView(CreateView):  
     model = Poll
     form_class = PollCreateForm
@@ -107,7 +107,7 @@ class PollUpdateView(UpdateView):
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # pass extra context to template
         context = super().get_context_data(**kwargs)
         context["subheading"] = "Info"
         return context
