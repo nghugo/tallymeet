@@ -17,9 +17,9 @@
         <div class=" max-w-lg mb-4">
 
         
-            <form id="container-form" method="post" novalidate>
+            <form id="container-form" method="post" novalidate">
                 {% csrf_token %}                
-                {{formset.management_form}} <!-- explained: https://www.brennantymrak.com/articles/django-dynamic-formsets-javascript -->
+                {{ formset.management_form }} <!-- explained: https://www.brennantymrak.com/articles/django-dynamic-formsets-javascript -->
                 {% for form in formset %}
                 <div class="option-form" class="flex flex-col outline outline-2 outline-slate-400 p-2 rounded-lg mb-5">
                     {{ form|crispy }}
@@ -68,6 +68,15 @@
         </script>
         
     </div>
+    {{ form.event_start_time }}
+    {{ form.event_start_time.errors }}
+    {{ form.event_end_time }}
+    {{ form.event_end_time.errors }}
+    *************************
     {{ form.errors }}
     {{ form.non_field_errors }}
+    {% for key in form %}
+        <p>{{ key }} </p>
+    {% endfor %}
+
 {% endblock content %}
