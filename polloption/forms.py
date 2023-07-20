@@ -9,7 +9,7 @@ class PollOptionCreateForm(ModelForm):
     class Meta:
         model = PollOption
         fields = ["poll_id", "event_start_time", "event_end_time"]
-        # poll_id is a hiddenfield, we will fill it in using the session object
+        # poll_id is a hiddenfield to be filled in using poll_id in url
         # to prevent tampering, also check for permission (against poll password of poll_id)        
 
         widgets = {
@@ -38,5 +38,5 @@ class PollOptionCreateForm(ModelForm):
 
 # Use a formset to repeat PollOptionCreateForm
 
-PollOptionCreateFormSet = forms.formset_factory(PollOptionCreateForm, extra=2)
+PollOptionCreateFormSet = forms.formset_factory(PollOptionCreateForm, extra=0)
 # using initial data with formset https://docs.djangoproject.com/en/4.2/topics/forms/formsets/#using-initial-data-with-a-formset

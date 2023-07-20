@@ -17,21 +17,23 @@ class PollOptionCreateView(CreateView):
     
     def get_initial(self):
         return {'poll_id':Poll.objects.get(pk=self.request.GET.get('poll_id'))}
-
-    # # # # # #
-    # Formset #
-    # # # # # #
-
-    # def get_context_data(self, **kwargs):  # pass extra context to template
-    #     context = super().get_context_data(**kwargs)
-    #     context["PollOptionCreateFormSet"] = PollOptionCreateFormSet
-    #     return context
     
     def form_valid(self, form):  # Called when valid form data has been POSTed, returns HttpResponse
         """ Set poll_id as final field entry again, to prevent tampering """
         form.instance.poll_id = self.request.GET.get('poll_id')
         return super().form_valid(form)
     
+    # # # # # #
+    # Formset #
+    # # # # # #
+
+    def get_context_data(self, **kwargs):  # pass extra context to template
+        context = super().get_context_data(**kwargs)
+        
+        # multiplier controls the number of forms
+        initial=[{'poll_id':Poll.objects.get(pk=self.request.GET.get('poll_id'))}] * 2
+        context["formset"] = PollOptionCreateFormSet(initial=initial)
+        return context
 
     # # # # # # # # # # # # # # # # # # # # # # # # # # #
     #  use form_valid to validate against poll password #
