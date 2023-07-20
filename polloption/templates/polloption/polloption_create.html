@@ -16,10 +16,10 @@
 
         <div class=" max-w-lg mb-4">
 
-        
+            <!-- docs: https://docs.djangoproject.com/en/4.2/topics/forms/modelforms/#specifying-widgets-to-use-in-the-form-with-widgets -->
             <form id="container-form" method="post" novalidate">
                 {% csrf_token %}                
-                {{ formset.management_form }} <!-- explained: https://www.brennantymrak.com/articles/django-dynamic-formsets-javascript -->
+                {{ formset.management_form }}
                 {% for form in formset %}
                 <div class="option-form flex flex-col outline outline-2 outline-slate-400 p-2 rounded-lg mb-5">
                     {{ form|crispy }}
@@ -27,12 +27,12 @@
                 {% endfor %}
             </form>
 
-            <div id="add-minus-group" class="flex flex-col sm:flex-row flex-wrap justify-center sm:justify-around items-center px-4 sm:px-0">
+            <div id="add-remove-group" class="flex flex-col sm:flex-row flex-wrap justify-center sm:justify-around items-center px-4 sm:px-0">
                 <button id="add-form" type="button" class="block min-w-full w-[48%] sm:min-w-min py-4 px-6 my-1 text-white font-semibold border border-cyan-700 rounded-xl focus:ring focus:ring-cyan-300 bg-cyan-600 hover:bg-cyan-700 transition ease-in-out duration-200">
                     <span class="material-symbols-outlined align-text-bottom">add_circle</span>
                     Add Poll Option
                 </button>
-                <button id="minus-form" type="button" class="block min-w-full w-[48%] sm:min-w-min py-4 px-6 my-1 text-white font-semibold border border-cyan-700 rounded-xl focus:ring focus:ring-cyan-300 bg-cyan-600 hover:bg-cyan-700 transition ease-in-out duration-200">
+                <button id="remove-form" type="button" class="block min-w-full w-[48%] sm:min-w-min py-4 px-6 my-1 text-white font-semibold border border-cyan-700 rounded-xl focus:ring focus:ring-cyan-300 bg-cyan-600 hover:bg-cyan-700 transition ease-in-out duration-200">
                     <span class="material-symbols-outlined align-text-bottom">do_not_disturb_on</span>
                     Remove Poll Option
                 </button>
@@ -48,12 +48,13 @@
             let optionForm = document.querySelectorAll(".option-form")
             let container = document.querySelector("#container-form")
             let addButton = document.querySelector("#add-form")
-            // let minusButton = document.querySelector("#minus-form")
+            // let removeButton = document.querySelector("#remove-form")
             let totalForms = document.querySelector("#id_form-TOTAL_FORMS")
-            let addMinusGroup =  document.querySelector("#add-minus-grup")
+            let addremoveGroup =  document.querySelector("#add-remove-grup")
     
             let formNum = optionForm.length-1  // Get the number of the last form on the page with zero-based indexing
             addButton.addEventListener('click', addForm)
+            addButton.addEventListener('click', removeForm)
     
             function addForm(e){
                 e.preventDefault()
@@ -61,18 +62,22 @@
                 let formRegex = RegExp(`form-(\\d){1}-`,'g')  //Regex to find all instances of the form number
                 formNum++
                 newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`) // Update the new form to have the correct form number
-                container.insertBefore(newForm, addMinusGroup)  // Insert the new form at the end of the list of forms
+                container.insertBefore(newForm, addremoveGroup)  // Insert the new form at the end of the list of forms
                 totalForms.setAttribute('value', `${formNum+1}`)  //Increment the number of total forms in the management form
+            }
+            function removeForm(e) {
+                e.preventDefault();
+                let formRegex = RegExp(`form-(\\d){1}-`, "g"); //Regex to find all instances of the form number
+                formNum--;
+                container.removeChild(container.lastElementChild)
+                totalForms.setAttribute("value", `${formNum - 1}`); //Decrement the number of total forms in the management form
             }
         </script>
         
         <div class="outline outline-red-600 mt-3">
             {{ formset.errors }}
-            {% comment %} {{ form.errors }}
+            {{ form.errors }}
             {{ form.non_field_errors }}
-            {% for key in form %}
-                <p>{{ key }} </p>
-            {% endfor %} {% endcomment %}
         </div>
     </div>
 {% endblock content %}

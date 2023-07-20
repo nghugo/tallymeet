@@ -34,25 +34,30 @@ class PollOptionCreateView(CreateView):  # CreateView
         """ Set poll_id as final field entry again, to prevent tampering """
         # form.instance.poll_id = self.request.GET.get('poll_id')  # temp disable DEBUG
         
-        print("**************** key, val received as:")
+        print("key, val received as:")
         for key, val in self.request.POST.items():
             print(key, val)
 
         instances = formset.save(commit=False)
+        print(f"this is instances: {instances}")  # EMPTY LIST !!!!!
         for instance in instances:
+            print(f"instance is {instance}")
             instance.poll_id = Poll.objects.get(pk=self.request.GET.get('poll_id'))
             instance.save()
         
-        # return super().form_valid(form)
+        # return super().form_valid(formset)
         return redirect('poll-home')
         
 
     def post(self, request, *args, **kwargs):
         formset = PollOptionCreateFormSet(request.POST)
+        print(f"**************** Formset is valid: {formset.is_valid()}")  # DEBUG
+        print(f"The errors: {formset.errors}")
+        print(f"The non-form errors: {formset.non_form_errors}")
         if formset.is_valid():
             return self.form_valid(formset)
-        return self.form_invalid(formset)
-        print(formset.is_valid)
+        return render('poll-option-create')
+
         for key, val in self.request.POST.items():
             print(key, val)
         return redirect('poll-home')
@@ -61,7 +66,7 @@ class PollOptionCreateView(CreateView):  # CreateView
         context = super(PollOptionCreateView, self).get_context_data(**kwargs)
         initial=[{
             'poll_id': Poll.objects.get(pk=self.request.GET.get('poll_id')),
-            'event_end_time': datetime.datetime.now()
+            # 'event_end_time': datetime.datetime.now()
             }]
         context["formset"] = PollOptionCreateFormSet(initial=initial)
         return context

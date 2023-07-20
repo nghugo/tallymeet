@@ -15,9 +15,14 @@ class PollOptionCreateForm(ModelForm):
 
         # temp disable DEBUG
         widgets = {
-            # 'event_start_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'event_start_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'event_end_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
+
+    # https://stackoverflow.com/questions/43478562/django-formset-return-empty-instances
+    def has_changed(self):
+        return True
+
 
     queryset = Poll.objects.all()  # MODIFY TO CONTROL POLL PASSWORD BASED PERMISSIONS
     poll_id = forms.ModelChoiceField(queryset = queryset, disabled=True)  # disabled=True keeps the initial value in form, and prevents tampering
@@ -55,7 +60,7 @@ PollOptionCreateFormSet = forms.modelformset_factory(
     form = PollOptionCreateForm, 
     exclude = None,
     extra = 0, 
-    max_num = 3,
+    max_num = 5,
 )
 
 # using initial data with formset https://docs.djangoproject.com/en/4.2/topics/forms/formsets/#using-initial-data-with-a-formset

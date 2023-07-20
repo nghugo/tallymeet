@@ -9,9 +9,6 @@ class PollOption(models.Model):
     poll_id = models.ForeignKey(Poll, on_delete=models.CASCADE)
     event_start_time = models.DateTimeField()
     event_end_time = models.DateTimeField()
-    # event_end_time = models.DateTimeField(blank=True, default=timezone.now)  # DEBUG rm later
-    # event_start_time = models.CharField(max_length=255, null=True, blank=True)  # DEBUG rm later
-    # event_end_time = models.CharField(max_length=255, null=True, blank=True)  # DEBUG rm later
 
     def __str__(self):
         return ''.join([str(self.poll_id), str(self.event_start_time), str(self.event_end_time)])
