@@ -10,38 +10,40 @@
 
 {% block content %}
     <div class="container px-4 my-4 mx-auto">
-        <form id="container-form" method="post" novalidate>
-            {% csrf_token %}
-            <h1 class="mb-6 text-3xl md:text-4xl lg:max-xl:text-3xl font-bold font-heading leading-none text-center md:text-left">
-                Create Poll Options
-            </h1>
-            
-            <div class=" max-w-lg mb-4">
+        <h1 class="mb-6 text-3xl md:text-4xl lg:max-xl:text-3xl font-bold font-heading leading-none text-center md:text-left">
+            Create Poll Options
+        </h1>
+
+        <div class=" max-w-lg mb-4">
+
+        
+            <form id="container-form" method="post" novalidate>
+                {% csrf_token %}                
                 {{formset.management_form}} <!-- explained: https://www.brennantymrak.com/articles/django-dynamic-formsets-javascript -->
                 {% for form in formset %}
                 <div class="option-form" class="flex flex-col outline outline-2 outline-slate-400 p-2 rounded-lg mb-5">
                     {{ form|crispy }}
                 </div>
                 {% endfor %}
-    
-                <div id="add-minus-group" class="flex flex-col sm:flex-row flex-wrap justify-center sm:justify-around items-center px-4 sm:px-0">
-                    <button id="add-form" type="button" class="block min-w-full w-[48%] sm:min-w-min py-4 px-6 my-1 text-white font-semibold border border-cyan-700 rounded-xl focus:ring focus:ring-cyan-300 bg-cyan-600 hover:bg-cyan-700 transition ease-in-out duration-200">
-                        <span class="material-symbols-outlined align-text-bottom">add_circle</span>
-                        Add Poll Option
-                    </button>
-                    <button id="minus-form" type="button" class="block min-w-full w-[48%] sm:min-w-min py-4 px-6 my-1 text-white font-semibold border border-cyan-700 rounded-xl focus:ring focus:ring-cyan-300 bg-cyan-600 hover:bg-cyan-700 transition ease-in-out duration-200">
-                        <span class="material-symbols-outlined align-text-bottom">do_not_disturb_on</span>
-                        Remove Poll Option
-                    </button>
-                </div>
-                
+            </form>
+
+            <div id="add-minus-group" class="flex flex-col sm:flex-row flex-wrap justify-center sm:justify-around items-center px-4 sm:px-0">
+                <button id="add-form" type="button" class="block min-w-full w-[48%] sm:min-w-min py-4 px-6 my-1 text-white font-semibold border border-cyan-700 rounded-xl focus:ring focus:ring-cyan-300 bg-cyan-600 hover:bg-cyan-700 transition ease-in-out duration-200">
+                    <span class="material-symbols-outlined align-text-bottom">add_circle</span>
+                    Add Poll Option
+                </button>
+                <button id="minus-form" type="button" class="block min-w-full w-[48%] sm:min-w-min py-4 px-6 my-1 text-white font-semibold border border-cyan-700 rounded-xl focus:ring focus:ring-cyan-300 bg-cyan-600 hover:bg-cyan-700 transition ease-in-out duration-200">
+                    <span class="material-symbols-outlined align-text-bottom">do_not_disturb_on</span>
+                    Remove Poll Option
+                </button>
             </div>
-            
+                
             <div class="flex flex-col sm:flex-row flex-wrap justify-center sm:justify-end items-center px-4">
                 <a href="{% url 'poll-home' %}" class="block min-w-full sm:min-w-min py-4 px-6 sm:ml-4 my-1 text-center text-black font-semibold border border-gray-300 rounded-xl focus:ring focus:ring-emerald-300 bg-white hover:bg-gray-100 transition ease-in-out duration-200">Cancel</a>
-                <button class="block min-w-full sm:min-w-min py-4 px-6 sm:ml-4 my-1 text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200" type="submit">Create</button>
+                <button form="container-form" class="block min-w-full sm:min-w-min py-4 px-6 sm:ml-4 my-1 text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200" type="submit">Create</button>
             </div>
-        </form>
+
+        </div>
 
         <script>
             let optionForm = document.querySelectorAll(".option-form")
@@ -56,14 +58,11 @@
     
             function addForm(e){
                 e.preventDefault()
-    
                 let newForm = optionForm[0].cloneNode(true)  // Clone the option form
                 let formRegex = RegExp(`form-(\\d){1}-`,'g')  //Regex to find all instances of the form number
-    
-                formNum++  // Increment the form number
+                formNum++
                 newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`) // Update the new form to have the correct form number
                 container.insertBefore(newForm, addMinusGroup)  // Insert the new form at the end of the list of forms
-                
                 totalForms.setAttribute('value', `${formNum+1}`)  //Increment the number of total forms in the management form
             }
         </script>
