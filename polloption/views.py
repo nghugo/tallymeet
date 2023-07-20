@@ -12,38 +12,59 @@ from .models import PollOption
 from poll.models import Poll
 
 
-class PollOptionCreateView(FormView):  # CreateView later DEBUG with FormView now
-    # model = PollOption
-    form_class = PollOptionCreateForm
+class PollOptionCreateView(CreateView):  # CreateView
+    model = PollOption
+    
+    form_class = PollOptionCreateForm  # original, but null data error
+    # form_class = PollOptionCreateFormSet
     template_name = 'polloption/polloption_create.html'  # override default polloption/polloption_form.html'
     
+    def get_form(self):
+        if self.request.method == 'POST':
+            return self.form_class(self.request.POST)
+        return self.form_class()
+
+    def get_success_url(self):
+        return self.success_url 
+
     def get_initial(self):
         return {'poll_id': Poll.objects.get(pk=self.request.GET.get('poll_id'))}
     
-    def form_valid(self, form):  # Called when valid form data has been POSTed, returns HttpResponse
+    def form_valid(self, formset):  # Called when valid form data has been POSTed, returns HttpResponse
         """ Set poll_id as final field entry again, to prevent tampering """
         # form.instance.poll_id = self.request.GET.get('poll_id')  # temp disable DEBUG
-
+        
         print("**************** key, val received as:")
         for key, val in self.request.POST.items():
             print(key, val)
 
-        # temp disable DEBUG
-        print("**************** key, val cleaned as:")
-        # cleaned_data = super().clean()
-        # for key, val in cleaned_data.items():
-        #     print(key, val)
+        instances = formset.save(commit=False)
+        for instance in instances:
+            instance.poll_id = Poll.objects.get(pk=self.request.GET.get('poll_id'))
+            instance.save()
+        
+        # return super().form_valid(form)
+        return redirect('poll-home')
+        
 
-        return super().form_valid(form)
+    def post(self, request, *args, **kwargs):
+        formset = PollOptionCreateFormSet(request.POST)
+        if formset.is_valid():
+            return self.form_valid(formset)
+        return self.form_invalid(formset)
+        print(formset.is_valid)
+        for key, val in self.request.POST.items():
+            print(key, val)
+        return redirect('poll-home')
 
     def get_context_data(self, **kwargs):  # pass formset as extra context to template
-        context = super().get_context_data(**kwargs)
-        initial=[{'poll_id':Poll.objects.get(pk=self.request.GET.get('poll_id'))}]
+        context = super(PollOptionCreateView, self).get_context_data(**kwargs)
+        initial=[{
+            'poll_id': Poll.objects.get(pk=self.request.GET.get('poll_id')),
+            'event_end_time': datetime.datetime.now()
+            }]
         context["formset"] = PollOptionCreateFormSet(initial=initial)
         return context
-    
-    def get_success_url(self):
-        return reverse("poll-home")
 
     # # # # # # # # # # # # # # # # # # # # # # # # # # #
     #  use form_valid to validate against poll password #
