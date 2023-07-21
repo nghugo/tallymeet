@@ -5,7 +5,7 @@ from .models import PollOption
 from poll.models import Poll
 
 
-class PollOptionCreateForm(ModelForm):
+class PollOptionEditForm(ModelForm):
 
     class Meta:
         model = PollOption
@@ -38,9 +38,9 @@ class PollOptionCreateForm(ModelForm):
         # TO IMPLEMENT CODE
 
 # docs: https://docs.djangoproject.com/en/4.2/ref/forms/models/#modelformset-factory
-PollOptionCreateFormSet = forms.modelformset_factory(
+PollOptionEditFormSet = forms.modelformset_factory(
     model = PollOption, 
-    form = PollOptionCreateForm, 
+    form = PollOptionEditForm, 
     exclude = None,
     extra = 0, 
     max_num = 20,
