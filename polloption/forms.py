@@ -24,27 +24,16 @@ class PollOptionCreateForm(ModelForm):
     poll_id = forms.ModelChoiceField(queryset = queryset, disabled=True, widget = forms.HiddenInput())
     # widget -> Hide from the form ; # disabled -> unchangable field
 
-    # temp disable DEBUG
-    # def clean(self):
-    #     cleaned_data = super().clean()
-    #     print("**************** key, val cleaned as:")
-    #     for key, val in cleaned_data.items():
-    #         print(key, val)
-    #     return super().clean()
-
-    #     event_start_time = cleaned_data.get("event_start_time")
-    #     event_end_time = cleaned_data.get("event_end_time")
+    def clean(self):  # data validation
+        cleaned_data = super().clean()
         
-    #     print("***************************")
-    #     for key, val in cleaned_data.items():
-    #         print(f"{key} received as {val}")
+        event_start_time = cleaned_data.get("event_start_time", None)
+        event_end_time = cleaned_data.get("event_end_time", None)
+        if event_start_time and event_end_time and event_start_time > event_end_time:
+                raise ValidationError('Event must not end before start')
         
-    #     if not (event_start_time and event_end_time):
-    #         raise ValidationError('Please enter both event start and end times')
-
-    #     if event_start_time > event_end_time:
-    #         raise ValidationError('Event must start before end')
-        
+        return cleaned_data
+    
         # also need to check for poll permission against poll_id here
         # TO IMPLEMENT CODE
 
@@ -54,7 +43,7 @@ PollOptionCreateFormSet = forms.modelformset_factory(
     form = PollOptionCreateForm, 
     exclude = None,
     extra = 0, 
-    max_num = 5,
+    max_num = 20,
 )
 
 # using initial data with formset https://docs.djangoproject.com/en/4.2/topics/forms/formsets/#using-initial-data-with-a-formset
