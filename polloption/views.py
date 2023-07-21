@@ -17,22 +17,18 @@ def pollOptionCreate(request):
         formset = PollOptionCreateFormSet(request.POST)
         if formset.is_valid():
             instances = formset.save(commit=False)
-            print(f"this are the instances: {instances}")
             for instance in instances:
-                print(f"an instance: {instance}")
                 instance.poll_id = Poll.objects.get(pk=request.GET.get('poll_id'))
                 instance.save()
             messages.add_message(request, messages.INFO, "Form option update successful")
             return redirect('poll-detail', pk=poll_id)
-        messages.add_message(request, messages.ERROR, "Form option update failed due to invalid form input")
+        messages.add_message(request, messages.ERROR, "Form option update failed due to invalid form input (all updates aborted)")
     else:  # GET request
         formset = PollOptionCreateFormSet()
-    
     
     return render(
         request, 
         template_name= "polloption/polloption_create.html", 
-        # viewname = "".join[reverse('poll-option-create'), "?poll_id=", poll_id], 
         context = {'formset': formset}
     )
 

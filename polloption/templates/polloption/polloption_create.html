@@ -11,7 +11,7 @@
 {% block content %}
     <div class="container px-4 my-4 mx-auto">
         <h1 class="mb-6 text-3xl md:text-4xl lg:max-xl:text-3xl font-bold font-heading leading-none text-center md:text-left">
-            Create Poll Options
+            Edit Poll Options
         </h1>
 
         <div class=" max-w-lg mb-4">
@@ -21,63 +21,34 @@
                 {% csrf_token %}                
                 {{ formset.management_form }}
                 {% for form in formset %}
-                <div class="option-form flex flex-col outline outline-2 outline-slate-400 p-2 rounded-lg mb-5">
-                    {{ form|crispy }}
+                <div class="outline outline-2 outline-slate-400 p-2 rounded-lg mb-5">
+                    <span class="block text-gray-500 text-md font-bold mb-2">
+                        Option {{ forloop.counter }}
+                    </span>
+                    <div class="flex flex-col">
+                        {{ form|crispy }}
+                    </div>
                 </div>
+
                 {% endfor %}
             </form>
 
             <div id="add-remove-group" class="flex flex-col sm:flex-row flex-wrap justify-center sm:justify-around items-center px-4 sm:px-0">
                 <button id="add-form" type="button" class="block min-w-full w-[48%] sm:min-w-min py-4 px-6 my-1 text-white font-semibold border border-cyan-700 rounded-xl focus:ring focus:ring-cyan-300 bg-cyan-600 hover:bg-cyan-700 transition ease-in-out duration-200">
                     <span class="material-symbols-outlined align-text-bottom">add_circle</span>
-                    Add Poll Option
+                    Add Option
                 </button>
-                <button id="remove-form" type="button" class="block min-w-full w-[48%] sm:min-w-min py-4 px-6 my-1 text-white font-semibold border border-cyan-700 rounded-xl focus:ring focus:ring-cyan-300 bg-cyan-600 hover:bg-cyan-700 transition ease-in-out duration-200">
+                {% comment %} <button id="remove-form" type="button" class="block min-w-full w-[48%] sm:min-w-min py-4 px-6 my-1 text-white font-semibold border border-cyan-700 rounded-xl focus:ring focus:ring-cyan-300 bg-cyan-600 hover:bg-cyan-700 transition ease-in-out duration-200">
                     <span class="material-symbols-outlined align-text-bottom">do_not_disturb_on</span>
-                    Remove Poll Option
-                </button>
+                    Remove Option
+                </button> {% endcomment %}
             </div>    
         </div>
 
         <div class="flex flex-col sm:flex-row flex-wrap justify-center sm:justify-end items-center px-4">
             <a href="{% url 'poll-home' %}" class="block min-w-full sm:min-w-min py-4 px-6 sm:ml-4 my-1 text-center text-black font-semibold border border-gray-300 rounded-xl focus:ring focus:ring-emerald-300 bg-white hover:bg-gray-100 transition ease-in-out duration-200">Cancel</a>
-            <button form="container-form" class="block min-w-full sm:min-w-min py-4 px-6 sm:ml-4 my-1 text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200" type="submit">Create</button>
+            <button form="container-form" class="block min-w-full sm:min-w-min py-4 px-6 sm:ml-4 my-1 text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200" type="submit">Save</button>
         </div>
-
-        <script>
-            let optionForm = document.querySelectorAll(".option-form")
-            let container = document.querySelector("#container-form")
-            let addButton = document.querySelector("#add-form")
-            // let removeButton = document.querySelector("#remove-form")
-            let totalForms = document.querySelector("#id_form-TOTAL_FORMS")
-            let addremoveGroup =  document.querySelector("#add-remove-grup")
-    
-            let formNum = optionForm.length-1  // Get the number of the last form on the page with zero-based indexing
-            addButton.addEventListener('click', addForm)
-            addButton.addEventListener('click', removeForm)
-    
-            function addForm(e){
-                e.preventDefault()
-                let newForm = optionForm[0].cloneNode(true)  // Clone the option form
-                let formRegex = RegExp(`form-(\\d){1}-`,'g')  //Regex to find all instances of the form number
-                formNum++
-                newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`) // Update the new form to have the correct form number
-                container.insertBefore(newForm, addremoveGroup)  // Insert the new form at the end of the list of forms
-                totalForms.setAttribute('value', `${formNum+1}`)  //Increment the number of total forms in the management form
-            }
-            function removeForm(e) {
-                e.preventDefault();
-                let formRegex = RegExp(`form-(\\d){1}-`, "g"); //Regex to find all instances of the form number
-                formNum--;
-                container.removeChild(container.lastElementChild)
-                totalForms.setAttribute("value", `${formNum - 1}`); //Decrement the number of total forms in the management form
-            }
-        </script>
         
-        <div class="outline outline-red-600 mt-3">
-            {{ formset.errors }}
-            {{ form.errors }}
-            {{ form.non_field_errors }}
-        </div>
     </div>
 {% endblock content %}

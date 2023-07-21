@@ -19,16 +19,10 @@ class PollOptionCreateForm(ModelForm):
             'event_end_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
 
-    # https://stackoverflow.com/questions/43478562/django-formset-return-empty-instances
-    def has_changed(self):
-        return True
-
 
     queryset = Poll.objects.all()  # MODIFY TO CONTROL POLL PASSWORD BASED PERMISSIONS
-    poll_id = forms.ModelChoiceField(queryset = queryset, disabled=True)  # disabled=True keeps the initial value in form, and prevents tampering
-    # poll_id = forms.ModelChoiceField(queryset = queryset, disabled=True, widget = forms.HiddenInput())
-    # event_start_time = forms.CharField()  # specifying this seems to cause error of not being able to submit
-    # event_end_time = forms.DateTimeField()  # specifying this seems to cause error of not being able to submit
+    poll_id = forms.ModelChoiceField(queryset = queryset, disabled=True, widget = forms.HiddenInput())
+    # widget -> Hide from the form ; # disabled -> unchangable field
 
     # temp disable DEBUG
     # def clean(self):
