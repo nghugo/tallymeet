@@ -1,12 +1,11 @@
 from django import forms
-from django.forms import ModelForm, BaseFormSet, Form
+from django.forms import ModelForm
 from django.core.exceptions import ValidationError
 from .models import PollOption
 from poll.models import Poll
 
 
 class PollOptionEditForm(ModelForm):
-
     class Meta:
         model = PollOption
         fields = ["poll_id", "event_start_time", "event_end_time"]
@@ -18,7 +17,6 @@ class PollOptionEditForm(ModelForm):
             'event_start_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'event_end_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
-
 
     queryset = Poll.objects.all()  # MODIFY TO CONTROL POLL PASSWORD BASED PERMISSIONS
     poll_id = forms.ModelChoiceField(queryset = queryset, disabled=True, widget = forms.HiddenInput())
@@ -46,4 +44,3 @@ PollOptionEditFormSet = forms.modelformset_factory(
     max_num = 20,
 )
 
-# using initial data with formset https://docs.djangoproject.com/en/4.2/topics/forms/formsets/#using-initial-data-with-a-formset

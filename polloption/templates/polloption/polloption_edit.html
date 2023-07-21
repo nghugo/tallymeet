@@ -10,11 +10,20 @@
 
 {% block content %}
     <div class="container px-4 my-4 mx-auto">
-        <h1 class="mb-6 text-3xl md:text-4xl lg:max-xl:text-3xl font-bold font-heading leading-none text-center md:text-left">
-            Edit Poll Options
-        </h1>
-
+        
         <div class=" max-w-lg mb-4">
+
+            <div class="flex flex-col sm:flex-row flex-wrap justify-between items-center sm:px-0 mb-4">
+                <span class="mb-6 text-3xl md:text-4xl lg:max-xl:text-3xl font-bold font-heading leading-none text-center md:text-left">
+                    Edit Poll Options
+                </span>
+                {% comment %} Received by pollOptionEdit in views.py, which calls addPollOption in scripts.py
+                https://stackoverflow.com/questions/54438473/how-to-execute-file-py-on-html-button-press-using-django {% endcomment %}
+                <button form="container-form" type="submit" name="add-form" class="block py-4 px-6 my-1 text-white font-semibold border border-cyan-700 rounded-xl focus:ring focus:ring-cyan-300 bg-cyan-600 hover:bg-cyan-700 transition ease-in-out duration-200">
+                    <span class="material-symbols-outlined align-text-bottom">add_circle</span>
+                    Add Option
+                </button>
+            </div>    
 
             <!-- docs: https://docs.djangoproject.com/en/4.2/topics/forms/modelforms/#specifying-widgets-to-use-in-the-form-with-widgets -->
             <form id="container-form" method="post" novalidate">
@@ -32,22 +41,14 @@
 
                 {% endfor %}
             </form>
-
-            <div id="add-remove-group" class="flex flex-col sm:flex-row flex-wrap justify-center sm:justify-around items-center px-4 sm:px-0">
-                <button id="add-form" type="button" class="block min-w-full w-[48%] sm:min-w-min py-4 px-6 my-1 text-white font-semibold border border-cyan-700 rounded-xl focus:ring focus:ring-cyan-300 bg-cyan-600 hover:bg-cyan-700 transition ease-in-out duration-200">
-                    <span class="material-symbols-outlined align-text-bottom">add_circle</span>
-                    Add Option
-                </button>
-                {% comment %} <button id="remove-form" type="button" class="block min-w-full w-[48%] sm:min-w-min py-4 px-6 my-1 text-white font-semibold border border-cyan-700 rounded-xl focus:ring focus:ring-cyan-300 bg-cyan-600 hover:bg-cyan-700 transition ease-in-out duration-200">
-                    <span class="material-symbols-outlined align-text-bottom">do_not_disturb_on</span>
-                    Remove Option
-                </button> {% endcomment %}
-            </div>    
+            
+            
+            
         </div>
 
         <div class="flex flex-col sm:flex-row flex-wrap justify-center sm:justify-end items-center px-4">
             <a href="{% url 'poll-detail' pk=pollid %}" class="block min-w-full sm:min-w-min py-4 px-6 sm:ml-4 my-1 text-center text-black font-semibold border border-gray-300 rounded-xl focus:ring focus:ring-emerald-300 bg-white hover:bg-gray-100 transition ease-in-out duration-200">Cancel</a>
-            <button form="container-form" class="block min-w-full sm:min-w-min py-4 px-6 sm:ml-4 my-1 text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200" type="submit">Save</button>
+            <button form="container-form" type="submit" class="block min-w-full sm:min-w-min py-4 px-6 sm:ml-4 my-1 text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200">Save</button>
         </div>
         
     </div>
