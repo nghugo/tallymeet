@@ -4,7 +4,6 @@ from django.core.exceptions import ValidationError
 from .models import PollOption
 from poll.models import Poll
 
-
 class PollOptionEditForm(ModelForm):
     class Meta:
         model = PollOption

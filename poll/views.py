@@ -169,6 +169,7 @@ def poll_verify_password(request):
             next_url = request.GET.get('next')
             id = request.GET.get('id')
             if not next_url:
+                messages.add_message(request, messages.ERROR, "No next URL to redirect to")
                 return redirect('poll-home')
             # entered_password_dict maps id to the user-entered poll_password, ie entered_password
             if 'entered_password_dict' not in request.session:  
@@ -186,7 +187,6 @@ def poll_verify_password(request):
 class PollDeleteView(DeleteView):
     model = Poll
     success_url = reverse_lazy('poll-home')  # reverse cannot be used with success_url -> use reverse_lazy
-    # success_url = "/"
     # default template is 'poll/poll_confirm_delete.html'
 
     def get(self, request, *args, **kwargs):
