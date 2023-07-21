@@ -5,6 +5,15 @@ from .models import PollOption
 from poll.models import Poll
 
 class PollOptionEditForm(ModelForm):
+    # def __init__(self, *args, **kwargs):
+    #     """Override to control the poll options
+    #     Such that only those belonging to the target poll are available."""
+        
+    #     self.poll_id = kwargs.pop('poll_id')
+    #     super(PollOptionEditForm, self).__init__(*args, **kwargs)
+    #     self.fields['poll_options'].queryset = PollOption.objects.filter(poll_id=self.poll_id)
+
+
     class Meta:
         model = PollOption
         fields = ["poll_id", "event_start_time", "event_end_time"]
@@ -17,9 +26,11 @@ class PollOptionEditForm(ModelForm):
             'event_end_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
 
-    queryset = Poll.objects.all()  # MODIFY TO CONTROL POLL PASSWORD BASED PERMISSIONS
-    poll_id = forms.ModelChoiceField(queryset = queryset, disabled=True, widget = forms.HiddenInput())
+    queryset = Poll.objects.all()
     # widget -> Hide from the form ; # disabled -> unchangable field
+    # poll_id = forms.ModelChoiceField(queryset = queryset, disabled=True, widget = forms.HiddenInput())
+    poll_id = forms.ModelChoiceField(queryset = queryset, disabled=True)
+    
 
     def clean(self):  # data validation
         cleaned_data = super().clean()
