@@ -186,7 +186,7 @@ class PollDeleteView(SuccessMessageMixin, DeleteView):
     model = Poll
     # default template is 'poll/poll_confirm_delete.html'
     success_url = reverse_lazy('poll-home')  # reverse cannot be used with success_url -> use reverse_lazy
-    # success_message = "Poll deleted successfully"
+    success_message = "Poll deleted successfully"
 
     def get(self, request, *args, **kwargs):
         self.object= self.get_object()
