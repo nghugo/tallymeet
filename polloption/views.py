@@ -14,24 +14,30 @@ from poll.models import Poll
 
 def pollOptionEdit(request):
     poll_id = str(request.GET.get('poll_id'))
+    pollOptions = PollOption.objects.filter(poll_id=poll_id)
 
     if request.method == 'POST':
-        formset = PollOptionEditFormSet(request.POST, queryset = PollOption.objects.filter(poll_id=poll_id))
+        formset = PollOptionEditFormSet(request.POST, queryset = pollOptions)
         if formset.is_valid():
             instances = formset.save(commit=False)
             for instance in instances:
-                instance.poll_id = Poll.objects.get(pk=request.GET.get('poll_id'))
+                instance.poll_id = Poll.objects.get(pk=poll_id)
                 instance.save()
             messages.add_message(request, messages.SUCCESS, "Poll options updated successfully")
             return redirect('poll-detail', pk=poll_id)
         messages.add_message(request, messages.ERROR, "Poll option updates failed due to invalid form input (all updates aborted)")
     
     else:  # GET request
-        formset = PollOptionEditFormSet(queryset = PollOption.objects.filter(poll_id=poll_id))
+        formset = PollOptionEditFormSet(queryset = pollOptions)
+    
+    if not pollOptions:
+        template_name= "polloption/polloption_empty_queryset.html", 
+    else:
+        template_name= "polloption/polloption_edit.html",
     
     return render(  # render request in template, and add context to template
         request, 
-        template_name= "polloption/polloption_edit.html", 
+        template_name= template_name, 
         context = {'formset': formset, 'pollid': poll_id}  # no space/ underscore allowed in context key
     )
 
@@ -54,7 +60,7 @@ def pollOptionDeleteList(request):
     pollOptions = PollOption.objects.filter(poll_id=poll_id)
 
     if not pollOptions:
-        template_name= "polloption/polloption_delete_list_empty.html", 
+        template_name= "polloption/polloption_empty_queryset.html", 
     else:
         template_name= "polloption/polloption_delete_list.html", 
     
