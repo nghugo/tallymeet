@@ -6,6 +6,7 @@ from django.contrib.auth.hashers import make_password
 from django.urls import reverse, reverse_lazy
 from passlib.handlers.django import django_pbkdf2_sha256
 from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
 
 from .forms import PollOptionEditFormSet, PollOptionEditForm
 from .models import PollOption
@@ -21,9 +22,9 @@ def pollOptionEdit(request):
             for instance in instances:
                 instance.poll_id = Poll.objects.get(pk=request.GET.get('poll_id'))
                 instance.save()
-            messages.add_message(request, messages.INFO, "Poll option updated successfully")
+            messages.add_message(request, messages.SUCCESS, "Poll options updated successfully")
             return redirect('poll-detail', pk=poll_id)
-        messages.add_message(request, messages.ERROR, "Poll option update failed due to invalid form input (all updates aborted)")
+        messages.add_message(request, messages.ERROR, "Poll option updates failed due to invalid form input (all updates aborted)")
     
     else:  # GET request
         formset = PollOptionEditFormSet(queryset = PollOption.objects.filter(poll_id=poll_id))
@@ -34,7 +35,7 @@ def pollOptionEdit(request):
         context = {'formset': formset, 'pollid': poll_id}  # no space/ underscore allowed in context key
     )
 
-class PollOptionCreateView(CreateView):
+class PollOptionCreateView(SuccessMessageMixin, CreateView):
     model = PollOption
     template_name = 'polloption/polloption_create.html'  # overwrite default 'polloption/polloption_form.html'
     form_class = PollOptionEditForm
@@ -59,8 +60,9 @@ def pollOptionDeleteList(request):
     )
     
 
-class PollOptionDeleteView(DeleteView):
+class PollOptionDeleteView(SuccessMessageMixin, DeleteView):
     model = PollOption
+    success_message = "Poll option deleted successfully"
     # default template is 'polloption/polloption_confirm_delete.html'
     
     def get_success_url(self):

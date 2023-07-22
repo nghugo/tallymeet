@@ -4,6 +4,7 @@ from django.contrib.auth.hashers import make_password
 from django.urls import reverse, reverse_lazy
 from passlib.handlers.django import django_pbkdf2_sha256
 from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
 
 from .forms import PollPasswordForm, PollCreateForm, PollUpdatePasswordForm
 from .models import Poll
@@ -18,15 +19,12 @@ def base(request):  # for debugging
     return render(request, "poll/base.html", {'title': 'BASE TEMPLATE'})
 
 
-def happy(request):  # for debugging, no inheritance
-    return render(request, "poll/happy.html")
-
-
 # default template for class based view: APP/MODEL_VIEWTYPE.html
-class PollCreateView(CreateView):  
+class PollCreateView(SuccessMessageMixin, CreateView):  
     model = Poll
     form_class = PollCreateForm
     template_name = 'poll/poll_create.html'  # override default poll_form.html'
+    success_message = "Poll created successfully"
 
     def get_form(self, form_class = PollCreateForm):  # just to override a label here
         form = super().get_form(form_class)
@@ -83,10 +81,11 @@ class PollDetailView(DetailView):  # default template is poll/poll_detail.html
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 
-class PollUpdateView(UpdateView):
+class PollUpdateView(SuccessMessageMixin, UpdateView):
     model = Poll
     fields = ['title', 'description', 'event_location']
     template_name = 'poll/poll_update.html'  # override default poll_form.html'
+    success_message = "Poll information updated successfully"
 
     def get(self, request, *args, **kwargs):
         self.object= self.get_object()
@@ -108,7 +107,7 @@ class PollUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):  # pass extra context to template
         context = super().get_context_data(**kwargs)
-        context["subheading"] = "Info"
+        context["subheading"] = "Information"
         return context
 
     def get_form(self, form_class = None):  # just to override 2 labels here
@@ -136,7 +135,7 @@ class PollUpdatePasswordView(UpdateView):
             elif not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed):
                 messages.add_message(self.request, messages.ERROR, "Incorrect password")
                 return redirect(reverse('poll-password') + "?id=" + str(id) + "&next=" + self.object.get_absolute_url())
-                
+
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 
@@ -144,9 +143,7 @@ class PollUpdatePasswordView(UpdateView):
         # if the user provided a new password for the poll, add to session object, and hash it before saving to database
         new_poll_password = self.request.POST.get('poll_password')
         
-        if not new_poll_password:
-            return super().form_valid(form)
-        else:
+        if new_poll_password:
             if super().form_valid(form):  # if form is valid, save the new password to the session object and db (hashed then handled by ModelForm)
                 id = str(self.object.__hash__())
                 self.request.session['entered_password_dict'][id] = new_poll_password
@@ -155,7 +152,8 @@ class PollUpdatePasswordView(UpdateView):
                 self.request.session.save()
                 poll_password_hashed = make_password(new_poll_password)  
                 form.instance.poll_password = poll_password_hashed
-            return super().form_valid(form)
+        messages.add_message(self.request, messages.SUCCESS, "Poll password updated successfully")
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):  # pass extra context to template
         context = super().get_context_data(**kwargs)
@@ -184,10 +182,11 @@ def poll_verify_password(request):
     return render(request, 'poll/poll_password.html', {'form': form})
 
 
-class PollDeleteView(DeleteView):
+class PollDeleteView(SuccessMessageMixin, DeleteView):
     model = Poll
-    success_url = reverse_lazy('poll-home')  # reverse cannot be used with success_url -> use reverse_lazy
     # default template is 'poll/poll_confirm_delete.html'
+    success_url = reverse_lazy('poll-home')  # reverse cannot be used with success_url -> use reverse_lazy
+    # success_message = "Poll deleted successfully"
 
     def get(self, request, *args, **kwargs):
         self.object= self.get_object()
