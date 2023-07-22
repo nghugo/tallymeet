@@ -39,11 +39,6 @@ class PollOptionCreateView(CreateView):
     template_name = 'polloption/polloption_create.html'  # overwrite default 'polloption/polloption_form.html'
     form_class = PollOptionEditForm
     success_message = "Poll option created successfully"
-    
-    def get_form(self, form_class = PollOptionEditForm):
-        form = super().get_form(form_class)
-        form.fields['poll_options'].queryset = PollOption.objects.filter(poll_id=2)
-        return form
 
     def get_initial(self):
         return {'poll_id': Poll.objects.get(pk=self.request.GET.get('poll_id'))}  # object associated with poll_id
@@ -52,6 +47,17 @@ class PollOptionCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         context["pollid"] = self.request.GET.get('poll_id')  # poll_id itself, context keys must not contain underscore
         return context
+
+def pollOptionDeleteList(request):
+    poll_id = str(request.GET.get('poll_id'))
+    pollOptions = PollOption.objects.filter(poll_id=poll_id)
+
+    return render(  # render request in template, and add context to template
+        request, 
+        template_name= "polloption/polloption_delete_list.html", 
+        context = {'pollOptions': pollOptions, 'pollid': poll_id}
+    )
+    
 
 class PollOptionDeleteView(DeleteView):
     model = PollOption

@@ -41,5 +41,4 @@ PollOptionEditFormSet = forms.modelformset_factory(
     form = PollOptionEditForm, 
     exclude = None,
     extra = 0,
-    max_num = 20,
 )
