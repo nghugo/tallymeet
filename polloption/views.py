@@ -15,7 +15,7 @@ def pollOptionEdit(request):
     poll_id = str(request.GET.get('poll_id'))
 
     if request.method == 'POST':
-        formset = PollOptionEditFormSet(request.POST)
+        formset = PollOptionEditFormSet(request.POST, queryset = PollOption.objects.filter(poll_id=poll_id))
         if formset.is_valid():
             instances = formset.save(commit=False)
             for instance in instances:
@@ -26,9 +26,9 @@ def pollOptionEdit(request):
         messages.add_message(request, messages.ERROR, "Poll option update failed due to invalid form input (all updates aborted)")
     
     else:  # GET request
-        formset = PollOptionEditFormSet()
+        formset = PollOptionEditFormSet(queryset = PollOption.objects.filter(poll_id=poll_id))
     
-    return render(
+    return render(  # render request in template, and add context to template
         request, 
         template_name= "polloption/polloption_edit.html", 
         context = {'formset': formset, 'pollid': poll_id}  # no space/ underscore allowed in context key
@@ -40,6 +40,11 @@ class PollOptionCreateView(CreateView):
     form_class = PollOptionEditForm
     success_message = "Poll option created successfully"
     
+    def get_form(self, form_class = PollOptionEditForm):
+        form = super().get_form(form_class)
+        form.fields['poll_options'].queryset = PollOption.objects.filter(poll_id=2)
+        return form
+
     def get_initial(self):
         return {'poll_id': Poll.objects.get(pk=self.request.GET.get('poll_id'))}  # object associated with poll_id
 

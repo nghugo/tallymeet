@@ -1,17 +1,21 @@
 from django import forms
 from django.forms import ModelForm
+from django.forms.models import BaseModelFormSet, BaseInlineFormSet
 from django.core.exceptions import ValidationError
 from .models import PollOption
 from poll.models import Poll
 
 class PollOptionEditForm(ModelForm):
-    # def __init__(self, *args, **kwargs):
-    #     """Override to control the poll options
-    #     Such that only those belonging to the target poll are available."""
+    def __init__(self, *args, **kwargs):
+        """By default, modelformset_facotry alwasy sustains the old data (from DB)
+        https://stackoverflow.com/questions/29472751/django-modelformset-factory-sustains-the-previously-submitted-data-even-after-su """
         
-    #     self.poll_id = kwargs.pop('poll_id')
-    #     super(PollOptionEditForm, self).__init__(*args, **kwargs)
-    #     self.fields['poll_options'].queryset = PollOption.objects.filter(poll_id=self.poll_id)
+        # self.poll_id = kwargs.pop('poll_id')
+        super(PollOptionEditForm, self).__init__(*args, **kwargs)
+        # self.fields['poll_id'].queryset = PollOption.objects.filter(id=self.poll_id)
+        
+        # self.queryset = PollOption.objects.filter(id=2)
+        self.queryset = PollOption.objects.none()
 
 
     class Meta:
@@ -26,10 +30,15 @@ class PollOptionEditForm(ModelForm):
             'event_end_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
 
-    queryset = Poll.objects.all()
+
     # widget -> Hide from the form ; # disabled -> unchangable field
     # poll_id = forms.ModelChoiceField(queryset = queryset, disabled=True, widget = forms.HiddenInput())
-    poll_id = forms.ModelChoiceField(queryset = queryset, disabled=True)
+    
+    # *************************************************
+    # TO IMPLEMENT QUERYSET FILTERING
+    # poll_id = forms.ModelChoiceField(queryset = Poll.objects.filter(id=2), disabled=True)
+    poll_id = forms.ModelChoiceField(queryset = Poll.objects.all(), disabled=True)
+    
     
 
     def clean(self):  # data validation
@@ -50,7 +59,24 @@ PollOptionEditFormSet = forms.modelformset_factory(
     model = PollOption, 
     form = PollOptionEditForm, 
     exclude = None,
-    extra = 0, 
+    extra = 0,
     max_num = 20,
 )
 
+# # inlineformset_factory takes care of queryset https://stackoverflow.com/questions/1988968/django-formset-how-to-update-an-object
+# PollOptionEditFormSet = forms.inlineformset_factory(
+#     parent_model = Poll, 
+#     model = PollOption, 
+#     form = PollOptionEditForm, 
+#     exclude = None,
+#     extra = 1,
+#     can_delete = False,
+# )
+
+# class PollOptionEditFormSet(BaseInlineFormSet):
+# # class PollOptionEditFormSet(BaseModelFormSet):
+#      def __init__(self, *args, **kwargs):
+#           super(PollOptionEditFormSet, self).__init__(*args, **kwargs)
+#           self.queryset = Poll.objects.none()
+#           self.model = PollOption
+#           # form, exclude, extra, max_num missing
