@@ -61,7 +61,17 @@ def pollOptionDeleteList(request):
 
 class PollOptionDeleteView(DeleteView):
     model = PollOption
-    success_url = reverse_lazy('poll-home')  # reverse cannot be used with success_url -> use reverse_lazy
     # default template is 'polloption/polloption_confirm_delete.html'
+    
+    def get_success_url(self):
+        poll_id = self.object.poll_id.id
+        return reverse_lazy('poll-option-delete-list') + f"?poll_id={poll_id}"  # reverse cannot be used with success_url -> use reverse_lazy
+
+    def get_context_data(self, **kwargs):  # pass extra context to template
+        context = super().get_context_data(**kwargs)
+        context["pollid"] = self.request.GET.get('poll_id')  # poll_id itself, context keys must not contain underscore
+        return context
+    
+    
 
     
