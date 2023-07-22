@@ -6,18 +6,6 @@ from .models import PollOption
 from poll.models import Poll
 
 class PollOptionEditForm(ModelForm):
-    def __init__(self, *args, **kwargs):
-        """By default, modelformset_facotry alwasy sustains the old data (from DB)
-        https://stackoverflow.com/questions/29472751/django-modelformset-factory-sustains-the-previously-submitted-data-even-after-su """
-        
-        # self.poll_id = kwargs.pop('poll_id')
-        super(PollOptionEditForm, self).__init__(*args, **kwargs)
-        # self.fields['poll_id'].queryset = PollOption.objects.filter(id=self.poll_id)
-        
-        # self.queryset = PollOption.objects.filter(id=2)
-        self.queryset = PollOption.objects.none()
-
-
     class Meta:
         model = PollOption
         fields = ["poll_id", "event_start_time", "event_end_time"]
@@ -30,16 +18,9 @@ class PollOptionEditForm(ModelForm):
             'event_end_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
 
-
-    # widget -> Hide from the form ; # disabled -> unchangable field
-    # poll_id = forms.ModelChoiceField(queryset = queryset, disabled=True, widget = forms.HiddenInput())
-    
-    # *************************************************
-    # TO IMPLEMENT QUERYSET FILTERING
-    # poll_id = forms.ModelChoiceField(queryset = Poll.objects.filter(id=2), disabled=True)
-    poll_id = forms.ModelChoiceField(queryset = Poll.objects.all(), disabled=True)
-    
-    
+    # widget -> Hide field from the form
+    # disabled -> Unchangable field (ignores user tampering)
+    poll_id = forms.ModelChoiceField(queryset = Poll.objects.all(), disabled=True, widget = forms.HiddenInput())
 
     def clean(self):  # data validation
         cleaned_data = super().clean()
@@ -62,21 +43,3 @@ PollOptionEditFormSet = forms.modelformset_factory(
     extra = 0,
     max_num = 20,
 )
-
-# # inlineformset_factory takes care of queryset https://stackoverflow.com/questions/1988968/django-formset-how-to-update-an-object
-# PollOptionEditFormSet = forms.inlineformset_factory(
-#     parent_model = Poll, 
-#     model = PollOption, 
-#     form = PollOptionEditForm, 
-#     exclude = None,
-#     extra = 1,
-#     can_delete = False,
-# )
-
-# class PollOptionEditFormSet(BaseInlineFormSet):
-# # class PollOptionEditFormSet(BaseModelFormSet):
-#      def __init__(self, *args, **kwargs):
-#           super(PollOptionEditFormSet, self).__init__(*args, **kwargs)
-#           self.queryset = Poll.objects.none()
-#           self.model = PollOption
-#           # form, exclude, extra, max_num missing
