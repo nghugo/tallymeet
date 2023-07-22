@@ -53,9 +53,14 @@ def pollOptionDeleteList(request):
     poll_id = str(request.GET.get('poll_id'))
     pollOptions = PollOption.objects.filter(poll_id=poll_id)
 
+    if not pollOptions:
+        template_name= "polloption/polloption_delete_list_empty.html", 
+    else:
+        template_name= "polloption/polloption_delete_list.html", 
+    
     return render(  # render request in template, and add context to template
         request, 
-        template_name= "polloption/polloption_delete_list.html", 
+        template_name = template_name, 
         context = {'pollOptions': pollOptions, 'pollid': poll_id}
     )
     

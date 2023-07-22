@@ -58,6 +58,9 @@ def getEnteredPassword(requestSession, id):
         entered_password_dict[id] = requestSession['pollPasswordAtPollCreation']  # mutate entered_password_dict to save the new password into the session object
         del requestSession['pollPasswordAtPollCreation']  # delete most recent password once used
     entered_password = entered_password_dict.get(id, "")
+    # explicit save -> by default, Django does not save to session DB after mutation, only addition or deletion of values
+            # see docs: https://docs.djangoproject.com/en/4.2/topics/http/sessions/#:~:text=When%20sessions%20are%20saved&text=To%20change%20this%20default%20behavior,has%20been%20created%20or%20modified.
+    requestSession.save()
     return entered_password
 
 class PollDetailView(DetailView):  # default template is poll/poll_detail.html
@@ -148,7 +151,7 @@ class PollUpdatePasswordView(UpdateView):
                 id = str(self.object.__hash__())
                 self.request.session['entered_password_dict'][id] = new_poll_password
                 # explicit save -> by default, Django does not save to session DB after mutation, only addition or deletion of values
-            # see docs: https://docs.djangoproject.com/en/4.2/topics/http/sessions/#:~:text=When%20sessions%20are%20saved&text=To%20change%20this%20default%20behavior,has%20been%20created%20or%20modified.
+                # see docs: https://docs.djangoproject.com/en/4.2/topics/http/sessions/#:~:text=When%20sessions%20are%20saved&text=To%20change%20this%20default%20behavior,has%20been%20created%20or%20modified.
                 self.request.session.save()
                 poll_password_hashed = make_password(new_poll_password)  
                 form.instance.poll_password = poll_password_hashed
