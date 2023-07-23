@@ -53,14 +53,19 @@ def getSavedPollPassword(requestSession, id):
         3. else returns empty string ("") 
             (represents None, we redirect but do not flash the "wrong password" message) """
     
-    entered_password_dict = requestSession.get('entered_password_dict', {})
+    if 'entered_password_dict' not in requestSession:
+        requestSession['entered_password_dict'] = {}
+    entered_password_dict = requestSession.get('entered_password_dict')
+
     if 'pollPasswordAtPollCreation' in requestSession:
         entered_password_dict[id] = requestSession['pollPasswordAtPollCreation']  # mutate entered_password_dict to save the new password into the session object
         del requestSession['pollPasswordAtPollCreation']  # delete most recent password once used
-    entered_password = entered_password_dict.get(id, "")
+    
     # explicit save -> by default, Django does not save to session DB after mutation, only addition or deletion of values
-            # see docs: https://docs.djangoproject.com/en/4.2/topics/http/sessions/#:~:text=When%20sessions%20are%20saved&text=To%20change%20this%20default%20behavior,has%20been%20created%20or%20modified.
+    # see docs: https://docs.djangoproject.com/en/4.2/topics/http/sessions/#:~:text=When%20sessions%20are%20saved&text=To%20change%20this%20default%20behavior,has%20been%20created%20or%20modified.
     requestSession.save()
+    
+    entered_password = entered_password_dict.get(id, "")
     return entered_password
 
 class PollDetailView(DetailView):  # default template is poll/poll_detail.html
@@ -80,7 +85,7 @@ class PollDetailView(DetailView):  # default template is poll/poll_detail.html
             elif not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed):
                 messages.add_message(self.request, messages.ERROR, "Incorrect password")
                 return redirect(reverse('poll-verify-password') + "?id=" + str(id) + "&next=" + self.object.get_absolute_url())
-            
+
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 

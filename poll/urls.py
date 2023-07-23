@@ -5,8 +5,8 @@ from .views import PollCreateView, PollDetailView , PollUpdateView, PollUpdatePa
 urlpatterns = [
     path("", views.home, name="poll-home"),
     path("base/", views.base, name="poll-base"),  # for debugging
-    path("poll/password/", views.poll_verify_password, name="poll-password"),
-    path("poll/passwordrwpid/", views.poll_verify_password_redirect_with_poll_id, name="poll-password-redir-wpid"),
+    path("poll/password/", views.poll_verify_password, name="poll-verify-password"),
+    path("poll/password_rwpid/", views.poll_verify_password_redirect_with_poll_id, name="poll-verify-password-redir-wpid"),
     
     path("poll/create/", PollCreateView.as_view(), name="poll-create"),
     path("poll/detail/<int:pk>/", PollDetailView.as_view(), name="poll-detail"),

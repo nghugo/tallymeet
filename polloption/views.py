@@ -21,10 +21,10 @@ def pollOptionEdit(request):
     entered_password = getSavedPollPassword(request.session, poll_id)
     if pollObject.poll_password:
         if not entered_password:
-            return redirect(reverse('poll-password-redir-wpid') + "?id=" + str(poll_id) + "&next=" + reverse('poll-option-edit') + "&poll_id=" + str(poll_id))
+            return redirect(reverse('poll-verify-password-redir-wpid') + "?id=" + str(poll_id) + "&next=" + reverse('poll-option-edit') + "&poll_id=" + str(poll_id))
         elif not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed):
             messages.add_message(request, messages.ERROR, "Incorrect password")
-            return redirect(reverse('poll-password-redir-wpid') + "?id=" + str(poll_id) + "&next=" + reverse('poll-option-edit') + "&poll_id=" + str(poll_id))
+            return redirect(reverse('poll-verify-password-redir-wpid') + "?id=" + str(poll_id) + "&next=" + reverse('poll-option-edit') + "&poll_id=" + str(poll_id))
 
     if request.method == 'POST':
         formset = PollOptionEditFormSet(request.POST, queryset = pollOptions)
