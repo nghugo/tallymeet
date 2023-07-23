@@ -82,7 +82,18 @@ def pollOptionCreate(request):
 
 def pollOptionDeleteList(request):
     poll_id = str(request.GET.get('poll_id'))
+    pollObject = Poll.objects.get(pk=poll_id)
     pollOptions = PollOption.objects.filter(poll_id=poll_id)
+
+    # password verification
+    poll_password_hashed = pollObject.poll_password
+    entered_password = getSavedPollPassword(request.session, poll_id)
+    if pollObject.poll_password:
+        if not entered_password:
+            return redirect(reverse('poll-verify-password-redir-wpid') + "?id=" + str(poll_id) + "&next=" + reverse('poll-option-delete-list') + "&poll_id=" + str(poll_id))
+        elif not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed):
+            messages.add_message(request, messages.ERROR, "Incorrect password")
+            return redirect(reverse('poll-verify-password-redir-wpid') + "?id=" + str(poll_id) + "&next=" + reverse('poll-option-delete-list') + "&poll_id=" + str(poll_id))
 
     if not pollOptions:
         template_name= "polloption/polloption_empty_queryset.html", 
