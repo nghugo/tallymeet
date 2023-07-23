@@ -52,6 +52,17 @@ def pollOptionEdit(request):
 
 def pollOptionCreate(request):
     poll_id = str(request.GET.get('poll_id'))
+    pollObject = Poll.objects.get(pk=poll_id)
+
+    # password verification
+    poll_password_hashed = pollObject.poll_password
+    entered_password = getSavedPollPassword(request.session, poll_id)
+    if pollObject.poll_password:
+        if not entered_password:
+            return redirect(reverse('poll-verify-password-redir-wpid') + "?id=" + str(poll_id) + "&next=" + reverse('poll-option-create') + "&poll_id=" + str(poll_id))
+        elif not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed):
+            messages.add_message(request, messages.ERROR, "Incorrect password")
+            return redirect(reverse('poll-verify-password-redir-wpid') + "?id=" + str(poll_id) + "&next=" + reverse('poll-option-create') + "&poll_id=" + str(poll_id))
 
     if request.method == 'POST':
         form = PollOptionEditForm(request.POST, initial={'poll_id' : poll_id})
@@ -59,7 +70,7 @@ def pollOptionCreate(request):
             form.save()
             messages.add_message(request, messages.SUCCESS, "Poll option created successfully")
             return redirect('poll-detail', pk=poll_id)
-        messages.add_message(request, messages.ERROR, "Poll option updates failed due to invalid form input (all updates aborted)")
+        messages.add_message(request, messages.ERROR, "Poll option creation failed due to invalid form input")
     else:  # GET request
         form = PollOptionEditForm(initial={'poll_id' : poll_id})
 
