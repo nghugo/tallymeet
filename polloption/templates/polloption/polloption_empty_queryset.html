@@ -11,13 +11,9 @@
             <p>This poll currently has no associated poll options.</p>
             <p>You can add a poll option, or return to the poll details page.</p>
         </div>
-        
-        
         <div class="flex flex-col sm:flex-row flex-wrap justify-center sm:justify-end items-center px-4">
-            
             <a href="{% url 'poll-detail' pollid %}" class="block min-w-full sm:min-w-min py-4 px-6 sm:ml-4 my-1 text-center text-black font-semibold border border-gray-300 rounded-xl focus:ring focus:ring-emerald-300 bg-white hover:bg-gray-100 transition ease-in-out duration-200">Back</a>
             <a href="{% url 'poll-option-create' %}?poll_id={{ pollid }}" class="block min-w-full sm:min-w-min py-4 px-6 sm:ml-4 my-1 text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200">Add an Option</a>
-            
         </div>
     </div>
 {% endblock content %}
