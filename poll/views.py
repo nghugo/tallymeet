@@ -5,6 +5,7 @@ from django.urls import reverse, reverse_lazy
 from passlib.handlers.django import django_pbkdf2_sha256
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
+from django.http import HttpResponseForbidden
 
 from .forms import PollPasswordForm, PollCreateForm, PollUpdatePasswordForm
 from .models import Poll
@@ -124,6 +125,17 @@ class PollUpdateView(SuccessMessageMixin, UpdateView):
         form.fields['event_location'].label = "Event Location (optional)"
         return form
 
+    def post(self, request, *args, **kwargs):
+        """ Add code before post() for poll password authentication """
+        self.object= self.get_object()
+        poll_password_hashed = self.object.poll_password
+        id = str(self.object.__hash__())
+        entered_password = getSavedPollPassword(self.request.session, id)
+
+        if poll_password_hashed and (not entered_password or not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed)):
+            return HttpResponseForbidden()
+        return super().post(request, *args, **kwargs)
+
 class PollUpdatePasswordView(UpdateView):
     model = Poll
     form_class = PollUpdatePasswordForm
@@ -167,6 +179,17 @@ class PollUpdatePasswordView(UpdateView):
         context = super().get_context_data(**kwargs)
         context["subheading"] = "Password"
         return context
+    
+    def post(self, request, *args, **kwargs):
+        """ Add code before post() for poll password authentication """
+        self.object= self.get_object()
+        poll_password_hashed = self.object.poll_password
+        id = str(self.object.__hash__())
+        entered_password = getSavedPollPassword(self.request.session, id)
+        
+        if poll_password_hashed and (not entered_password or not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed)):
+            return HttpResponseForbidden()
+        return super().post(request, *args, **kwargs)
 
 def poll_verify_password(request):
     if request.method == 'POST':
@@ -236,3 +259,13 @@ class PollDeleteView(SuccessMessageMixin, DeleteView):
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 
+    def post(self, request, *args, **kwargs):
+        """ Add code before post() for poll password authentication """
+        self.object= self.get_object()
+        poll_password_hashed = self.object.poll_password
+        id = str(self.object.__hash__())
+        entered_password = getSavedPollPassword(self.request.session, id)
+        
+        if poll_password_hashed and (not entered_password or not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed)):
+            return HttpResponseForbidden()
+        return super().post(request, *args, **kwargs)
