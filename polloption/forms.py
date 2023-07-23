@@ -11,8 +11,7 @@ class PollOptionEditForm(ModelForm):
         fields = ["poll_id", "event_start_time", "event_end_time"]
         # poll_id is a hiddenfield to be filled in using poll_id in url
         # to prevent tampering, also need to check for permission (against poll password of poll_id)        
-
-        # temp disable DEBUG
+        
         widgets = {
             'event_start_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'event_end_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),

@@ -121,6 +121,26 @@ class PollOptionDeleteView(SuccessMessageMixin, DeleteView):
         context["pollid"] = self.request.GET.get('poll_id')  # poll_id itself, context keys must not contain underscore
         return context
     
+    def get(self, request, *args, **kwargs):
+        self.object= self.get_object()
+        poll_id = str(request.GET.get('poll_id'))
+        pollObject = Poll.objects.get(pk=poll_id)
+        poll_password_hashed = pollObject.poll_password
+        entered_password = getSavedPollPassword(self.request.session, poll_id)
+
+        # if poll has a password and the user-provided-password does not exist or does not match -> redirect to password verification
+        # in the "does not match" case, also show a flash message for user feedback
+        if poll_password_hashed:
+            if not entered_password:
+                return redirect(reverse('poll-verify-password-redir-wpid') + "?id=" + str(poll_id) + "&next=" + reverse('poll-option-delete', args=[self.object.id]) + "&poll_id=" + str(poll_id))
+            elif not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed):
+                messages.add_message(self.request, messages.ERROR, "Incorrect password")
+                return redirect(reverse('poll-verify-password-redir-wpid') + "?id=" + str(poll_id) + "&next=" + reverse('poll-option-delete', args=[self.object.id]) + "&poll_id=" + str(poll_id))
+            
+        context = self.get_context_data(object=pollObject)
+        context['pollid'] = poll_id
+        return self.render_to_response(context)
+    
     
 
     
