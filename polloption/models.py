@@ -18,9 +18,15 @@ class PollOption(models.Model):
         return reverse('poll-detail', kwargs={'pk': self.poll_id.id})  # return full URL as string
 
 class PollOptionResponse(models.Model):
-    responder_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    PREFER = "P"
+    YES = "Y"
+    NO = "N"
+    RESPONSE_CHOICES = [(PREFER, "Prefer"), (YES, "Yes"), (NO, "No")]
+
     poll_option_id = models.ForeignKey(PollOption, on_delete=models.CASCADE)
-    response = models.CharField(max_length=8)
+    responder_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    responder_name = models.CharField(max_length=255)
+    response = models.CharField(max_length=1, choices=RESPONSE_CHOICES)
 
     def __str__(self):
         return ''.join([str(self.responder_id), str(self.poll_option_id)])
