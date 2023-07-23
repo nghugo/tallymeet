@@ -5,6 +5,7 @@ from django.urls import reverse, reverse_lazy
 from passlib.handlers.django import django_pbkdf2_sha256
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
+from django.http import HttpResponseForbidden
 
 from .forms import PollOptionEditFormSet, PollOptionEditForm
 from .models import PollOption
@@ -16,7 +17,7 @@ def pollOptionEdit(request):
     pollOptions = PollOption.objects.filter(poll_id=poll_id)
     pollObject = Poll.objects.get(pk=poll_id)
 
-    # password verification
+    # password verification for both GET and POST
     poll_password_hashed = pollObject.poll_password
     entered_password = getSavedPollPassword(request.session, poll_id)
     if pollObject.poll_password:
@@ -54,7 +55,7 @@ def pollOptionCreate(request):
     poll_id = str(request.GET.get('poll_id'))
     pollObject = Poll.objects.get(pk=poll_id)
 
-    # password verification
+    # password verification for both GET and POST
     poll_password_hashed = pollObject.poll_password
     entered_password = getSavedPollPassword(request.session, poll_id)
     if pollObject.poll_password:
@@ -85,7 +86,7 @@ def pollOptionDeleteList(request):
     pollObject = Poll.objects.get(pk=poll_id)
     pollOptions = PollOption.objects.filter(poll_id=poll_id)
 
-    # password verification
+    # password verification for both GET and POST
     poll_password_hashed = pollObject.poll_password
     entered_password = getSavedPollPassword(request.session, poll_id)
     if pollObject.poll_password:
@@ -140,7 +141,18 @@ class PollOptionDeleteView(SuccessMessageMixin, DeleteView):
         context = self.get_context_data(object=pollObject)
         context['pollid'] = poll_id
         return self.render_to_response(context)
-    
+        
+    def post(self, request, *args, **kwargs):
+        """ Add code before post() for poll password authentication """
+        self.object= self.get_object()
+        poll_id = str(request.GET.get('poll_id'))
+        pollObject = Poll.objects.get(pk=poll_id)
+        poll_password_hashed = pollObject.poll_password
+        entered_password = getSavedPollPassword(self.request.session, poll_id)
+        
+        if poll_password_hashed and (not entered_password or not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed)):
+            return HttpResponseForbidden()
+        return super().post(request, *args, **kwargs)
     
 
     
