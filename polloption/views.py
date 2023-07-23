@@ -138,8 +138,7 @@ class PollOptionDeleteView(SuccessMessageMixin, DeleteView):
                 messages.add_message(self.request, messages.ERROR, "Incorrect password")
                 return redirect(reverse('poll-verify-password-redir-wpid') + "?id=" + str(poll_id) + "&next=" + reverse('poll-option-delete', args=[self.object.id]) + "&poll_id=" + str(poll_id))
             
-        context = self.get_context_data(object=pollObject)
-        context['pollid'] = poll_id
+        context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
         
     def post(self, request, *args, **kwargs):
