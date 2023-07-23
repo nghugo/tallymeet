@@ -54,7 +54,7 @@ def getSavedPollPassword(requestSession, id):
             (represents None, we redirect but do not flash the "wrong password" message) """
     
     if 'entered_password_dict' not in requestSession:
-        requestSession['entered_password_dict'] = {}
+        requestSession['entered_password_dict'] = {}  # maps id (str) -> password (str)
     entered_password_dict = requestSession.get('entered_password_dict')
 
     if 'pollPasswordAtPollCreation' in requestSession:
