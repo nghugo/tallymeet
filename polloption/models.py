@@ -1,6 +1,6 @@
 from django.db import models
 from django.urls import reverse
-from django.utils import timezone
+from django.contrib.auth.models import User
 
 from poll.models import Poll
 
@@ -16,3 +16,11 @@ class PollOption(models.Model):
     
     def get_absolute_url(self):
         return reverse('poll-detail', kwargs={'pk': self.poll_id.id})  # return full URL as string
+
+class PollOptionResponse(models.Model):
+    responder_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    poll_option_id = models.ForeignKey(PollOption, on_delete=models.CASCADE)
+    response = models.CharField(max_length=8)
+
+    def __str__(self):
+        return ''.join([str(self.responder_id), str(self.poll_option_id)])
