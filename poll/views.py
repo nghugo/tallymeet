@@ -9,6 +9,7 @@ from django.http import HttpResponseForbidden
 
 from .forms import PollPasswordForm, PollCreateForm, PollUpdatePasswordForm
 from .models import Poll
+from .views_helper import getSavedPollPassword, getSorted_OptionsResponsesList, addDenseRank
 
 from polloption.models import PollOption, PollOptionResponse
 
@@ -41,60 +42,6 @@ class PollCreateView(SuccessMessageMixin, CreateView):
         return super().form_valid(form)
     
 
-def getSavedPollPassword(requestSession, id):
-    """ Objective: return the latest correct poll password the user provided for a poll id, and also save it under poll_id key of the entered_password_dict in the session object
-        -------------------------------------------------------------------
-        Priorities:
-        1. returns self.request.session['pollPasswordAtPollCreation'] if exists
-            (most recent password is set after creating poll)
-            (required because the object (hence its id) would not have been created by that point)
-            (hence, we can't set requestSession['entered_password_dict'][id] yet)
-        2. else returns requestSession['entered_password_dict'][id] if exists
-            (represents the latest correct poll password the user provided for a poll id)
-        3. else returns empty string ("") 
-            (represents None, we redirect but do not flash the "wrong password" message) """
-    
-    if 'entered_password_dict' not in requestSession:
-        requestSession['entered_password_dict'] = {}  # maps id (str) -> password (str)
-    entered_password_dict = requestSession.get('entered_password_dict')
-
-    if 'pollPasswordAtPollCreation' in requestSession:
-        entered_password_dict[id] = requestSession['pollPasswordAtPollCreation']  # mutate entered_password_dict to save the new password into the session object
-        del requestSession['pollPasswordAtPollCreation']  # delete most recent password once used
-    
-    # explicit save -> by default, Django does not save to session DB after mutation, only addition or deletion of values
-    # see docs: https://docs.djangoproject.com/en/4.2/topics/http/sessions/#:~:text=When%20sessions%20are%20saved&text=To%20change%20this%20default%20behavior,has%20been%20created%20or%20modified.
-    requestSession.save()
-    
-    entered_password = entered_password_dict.get(id, "")
-    return entered_password
-
-def getSorted_OptionsResponsesList(poll):
-    """ Given a particular poll, returns an object voting results.
-    The object contains all poll options and associated counts of PREFER, YES, and NO"""
-
-    options = PollOption.objects.filter(poll_id = poll)
-    optionsResponsesList = []   
-
-    for option in options:
-        responseToPeople = {PollOptionResponse.YES: [], PollOptionResponse.PREFER: [], PollOptionResponse.NO: []}
-        for optionResponse in PollOptionResponse.objects.filter(poll_option_id = option):
-            if optionResponse.response == PollOptionResponse.YES:
-                responseToPeople[PollOptionResponse.YES].append(optionResponse.responder_name)
-            elif optionResponse.response == PollOptionResponse.PREFER:
-                responseToPeople[PollOptionResponse.PREFER].append(optionResponse.responder_name)
-            else:
-                responseToPeople[PollOptionResponse.NO].append(optionResponse.responder_name)
-        optionsResponsesList.append([option, responseToPeople])
-
-    # sort by YES count (desc) then PREFER count (desc)
-    optionsResponsesList.sort(key = lambda obj: (-len(obj[1][PollOptionResponse.YES]), -len(obj[1][PollOptionResponse.PREFER])))
-    for optionResponses in optionsResponsesList:
-        print(optionResponses)
-
-    return optionsResponsesList
-    
-
 class PollDetailView(DetailView):  # default template is poll/poll_detail.html
     model = Poll
 
@@ -113,15 +60,14 @@ class PollDetailView(DetailView):  # default template is poll/poll_detail.html
                 messages.add_message(self.request, messages.ERROR, "Incorrect password")
                 return redirect(reverse('poll-verify-password') + "?id=" + str(id) + "&next=" + self.object.get_absolute_url())
 
-        # Fetch counts for each poll option
+        # Fetch counts for each poll option, sort, and add dense rank
         sortedOptionResponsesList = getSorted_OptionsResponsesList(self.object)      
-        
-        # # DEBUG
-        # print("Sorted **************")
-        # for optionResponses in sortedOptionResponsesList:
-        #     print(optionResponses)
-        #     print()
+        sortedOptionResponsesList = addDenseRank(sortedOptionResponsesList)
 
+        # DEBUG
+        # for obj in sortedOptionResponsesList:
+        #     print(obj)
+            
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 
@@ -226,6 +172,7 @@ class PollUpdatePasswordView(UpdateView):
             return HttpResponseForbidden()
         return super().post(request, *args, **kwargs)
 
+
 def poll_verify_password(request):
     if request.method == 'POST':
         form = PollPasswordForm(request.POST)
@@ -246,6 +193,7 @@ def poll_verify_password(request):
     else:  # GET request
         form = PollPasswordForm()
     return render(request, 'poll/poll_password.html', {'form': form})
+
 
 def poll_verify_password_redirect_with_poll_id(request):
     if request.method == 'POST':
