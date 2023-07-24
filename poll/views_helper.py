@@ -63,8 +63,14 @@ def getSorted_OptionsResponsesList(poll):
                 responseToPeople[PollOptionResponse.NO].append(optionResponse.responder_name)
         optionsResponsesList.append([option, responseToPeople])
 
-    # sort by YES count (desc) then PREFER count (desc)
-    optionsResponsesList.sort(key = lambda obj: (-len(obj[1][PollOptionResponse.YES]), -len(obj[1][PollOptionResponse.PREFER])))
+    # sort by YES+PREFER count (desc) then PREFER count (desc)
+    optionsResponsesList.sort(
+        key = lambda obj: (
+            - len(obj[1][PollOptionResponse.YES]) - len(obj[1][PollOptionResponse.PREFER]),
+            - len(obj[1][PollOptionResponse.PREFER])
+        )
+    )
+        
 
     return optionsResponsesList
 
