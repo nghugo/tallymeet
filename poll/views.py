@@ -10,7 +10,7 @@ from django.http import HttpResponseForbidden
 from .forms import PollPasswordForm, PollCreateForm, PollUpdatePasswordForm
 from .models import Poll
 
-# Create your views here.
+from polloption.models import PollOption, PollOptionResponse
 
 def home(request):
     return render(request, "poll/home.html", {'title': 'Tallymeet'})
@@ -69,6 +69,32 @@ def getSavedPollPassword(requestSession, id):
     entered_password = entered_password_dict.get(id, "")
     return entered_password
 
+def getSorted_OptionsResponsesList(poll):
+    """ Given a particular poll, returns an object voting results.
+    The object contains all poll options and associated counts of PREFER, YES, and NO"""
+
+    options = PollOption.objects.filter(poll_id = poll)
+    optionsResponsesList = []   
+
+    for option in options:
+        responseToPeople = {PollOptionResponse.YES: [], PollOptionResponse.PREFER: [], PollOptionResponse.NO: []}
+        for optionResponse in PollOptionResponse.objects.filter(poll_option_id = option):
+            if optionResponse.response == PollOptionResponse.YES:
+                responseToPeople[PollOptionResponse.YES].append(optionResponse.responder_name)
+            elif optionResponse.response == PollOptionResponse.PREFER:
+                responseToPeople[PollOptionResponse.PREFER].append(optionResponse.responder_name)
+            else:
+                responseToPeople[PollOptionResponse.NO].append(optionResponse.responder_name)
+        optionsResponsesList.append([option, responseToPeople])
+
+    # sort by YES count (desc) then PREFER count (desc)
+    optionsResponsesList.sort(key = lambda obj: (-len(obj[1][PollOptionResponse.YES]), -len(obj[1][PollOptionResponse.PREFER])))
+    for optionResponses in optionsResponsesList:
+        print(optionResponses)
+
+    return optionsResponsesList
+    
+
 class PollDetailView(DetailView):  # default template is poll/poll_detail.html
     model = Poll
 
@@ -78,14 +104,23 @@ class PollDetailView(DetailView):  # default template is poll/poll_detail.html
         id = str(self.object.__hash__())
         entered_password = getSavedPollPassword(self.request.session, id)
         
-        # if poll has a password and the user-provided-password does not exist or does not match -> redirect to password verification
-        # in the "does not match" case, also show a flash message for user feedback
+        # If poll has a password and the user-provided-password does not exist or does not match -> redirect to password verification
+        # In the "does not match" case, also show a flash message for user feedback
         if poll_password_hashed:
             if not entered_password:
                 return redirect(reverse('poll-verify-password') + "?id=" + str(id) + "&next=" + self.object.get_absolute_url())
             elif not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed):
                 messages.add_message(self.request, messages.ERROR, "Incorrect password")
                 return redirect(reverse('poll-verify-password') + "?id=" + str(id) + "&next=" + self.object.get_absolute_url())
+
+        # Fetch counts for each poll option
+        sortedOptionResponsesList = getSorted_OptionsResponsesList(self.object)      
+        
+        # # DEBUG
+        # print("Sorted **************")
+        # for optionResponses in sortedOptionResponsesList:
+        #     print(optionResponses)
+        #     print()
 
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
