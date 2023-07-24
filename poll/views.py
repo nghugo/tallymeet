@@ -64,9 +64,9 @@ class PollDetailView(DetailView):  # default template is poll/poll_detail.html
         sortedOptionResponsesList = getSorted_OptionsResponsesList(self.object)      
         sortedOptionResponsesList = addDenseRank(sortedOptionResponsesList)
 
-        # DEBUG
-        for obj in sortedOptionResponsesList:
-            print(obj)
+        # # DEBUG
+        # for obj in sortedOptionResponsesList:
+        #     print(obj)
             
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
