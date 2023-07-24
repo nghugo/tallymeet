@@ -1,3 +1,5 @@
+from django.template.defaulttags import register
+
 from polloption.models import PollOption, PollOptionResponse
 
 def getSavedPollPassword(requestSession, id):
@@ -28,7 +30,7 @@ def getSavedPollPassword(requestSession, id):
     entered_password = entered_password_dict.get(id, "")
     return entered_password
 
-def getSorted_OptionsResponsesList(poll):
+def getRankedResponses(poll):
     """ Given a particular poll, returns an object voting results.
     The object contains all poll options and associated counts of PREFER, YES, and NO
     
@@ -50,7 +52,7 @@ def getSorted_OptionsResponsesList(poll):
     """
 
     options = PollOption.objects.filter(poll_id = poll)
-    optionsResponsesList = []   
+    rankedResponses = []   
 
     for option in options:
         responseToPeople = {PollOptionResponse.YES: [], PollOptionResponse.PREFER: [], PollOptionResponse.NO: []}
@@ -61,10 +63,10 @@ def getSorted_OptionsResponsesList(poll):
                 responseToPeople[PollOptionResponse.PREFER].append(optionResponse.responder_name)
             else:
                 responseToPeople[PollOptionResponse.NO].append(optionResponse.responder_name)
-        optionsResponsesList.append([option, responseToPeople])
+        rankedResponses.append([option, responseToPeople])
 
     # sort by YES+PREFER count (desc) then PREFER count (desc)
-    optionsResponsesList.sort(
+    rankedResponses.sort(
         key = lambda obj: (
             - len(obj[1][PollOptionResponse.YES]) - len(obj[1][PollOptionResponse.PREFER]),
             - len(obj[1][PollOptionResponse.PREFER])
@@ -72,10 +74,10 @@ def getSorted_OptionsResponsesList(poll):
     )
         
 
-    return optionsResponsesList
+    return rankedResponses
 
-def addDenseRank(sortedOptionResponsesList):
-    """ Given a particular sortedOptionResponsesList, 
+def addDenseRank(rankedResponses):
+    """ Given a particular rankedResponses, 
     returns a version with dense rank appended to the end of each object
     
     The input looks like:
@@ -96,9 +98,9 @@ def addDenseRank(sortedOptionResponsesList):
     
     """
     rank = 1
-    for i in range(len(sortedOptionResponsesList)):
-        curr = sortedOptionResponsesList[i]
-        prev = sortedOptionResponsesList[i-1] if i > 0 else None
+    for i in range(len(rankedResponses)):
+        curr = rankedResponses[i]
+        prev = rankedResponses[i-1] if i > 0 else None
         if i > 0 and (
             len(curr[1][PollOptionResponse.YES]) != len(prev[1][PollOptionResponse.YES])
             or len(curr[1][PollOptionResponse.PREFER]) != len(prev[1][PollOptionResponse.PREFER])
@@ -106,4 +108,13 @@ def addDenseRank(sortedOptionResponsesList):
             rank += 1
         curr.append(rank)
     
-    return sortedOptionResponsesList
+    return rankedResponses
+
+
+@register.filter
+def get_item(dictionary, key):
+    """
+    Allows querying of dictionary in Django templates using syntax {{ mydict|get_item:item.NAME }}
+    https://stackoverflow.com/questions/8000022/django-template-how-to-look-up-a-dictionary-value-with-a-variable
+    """
+    return dictionary.get(key)

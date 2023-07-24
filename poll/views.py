@@ -9,9 +9,12 @@ from django.http import HttpResponseForbidden
 
 from .forms import PollPasswordForm, PollCreateForm, PollUpdatePasswordForm
 from .models import Poll
-from .views_helper import getSavedPollPassword, getSorted_OptionsResponsesList, addDenseRank
+from .views_helper import getSavedPollPassword, getRankedResponses, addDenseRank
+from .views_helper import get_item  # not explicitly called, but required for dictionary query inside template of DetailView 
 
 from polloption.models import PollOption, PollOptionResponse
+
+
 
 def home(request):
     return render(request, "poll/home.html", {'title': 'Tallymeet'})
@@ -61,14 +64,20 @@ class PollDetailView(DetailView):  # default template is poll/poll_detail.html
                 return redirect(reverse('poll-verify-password') + "?id=" + str(id) + "&next=" + self.object.get_absolute_url())
 
         # Fetch counts for each poll option, sort, and add dense rank
-        sortedOptionResponsesList = getSorted_OptionsResponsesList(self.object)      
-        sortedOptionResponsesList = addDenseRank(sortedOptionResponsesList)
+        rankedResponses = getRankedResponses(self.object)      
+        rankedResponses = addDenseRank(rankedResponses)
 
         # # DEBUG
-        # for obj in sortedOptionResponsesList:
+        # for obj in rankedResponses:
         #     print(obj)
             
-        context = self.get_context_data(object=self.object)
+        context = self.get_context_data(
+            object = self.object, 
+            rankedResponses = rankedResponses,
+            yKey = PollOptionResponse.YES, 
+            pKey = PollOptionResponse.PREFER, 
+            nKey = PollOptionResponse.NO, 
+        )
         return self.render_to_response(context)
 
 class PollUpdateView(SuccessMessageMixin, UpdateView):

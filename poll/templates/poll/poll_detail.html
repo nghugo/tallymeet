@@ -54,10 +54,68 @@
             </div>
 
         </div>
+        
+        <div class="container mt-10 mx-auto">
+            <div class="grid  items-center max-w-min mx-auto sm:mx-0 grid-cols-[1.5rem,1fr,1.5rem,1fr,1.5rem,1fr] my-3">
+                <div class="bg-teal-600 w-4 h-4 mr-1"></div>
+                <p class="mr-4">Prefer</p>
+                <div class="bg-teal-500 w-4 h-4 mr-1"></div>
+                <p class="mr-4">Yes</p>
+                <div class="bg-slate-400 w-4 h-4 mr-1"></div>
+                <p>No</p>
+            </div>
+            
+            {% for r in rankedResponses %}
+                <p> Rank: {{ r.2 }} </p>  <!-- django index i is .i rather than [i] -->
+                
+                <p> Event start time: {{ r.0.event_start_time }} </p>
+                <p> Event end time:{{ r.0.event_end_time }} </p>
+
+                <p> "Prefer" responders:
+                    {% if r.1|get_item:pKey|length > 0 %}
+                        {{ r.1|get_item:pKey }}
+                    {% else %}
+                        None
+                    {% endif %}
+                </p>
+                <p> "Yes" responders:
+                    {% if r.1|get_item:yKey|length > 0 %}
+                        {{ r.1|get_item:yKey }}
+                    {% else %}
+                        None
+                    {% endif %}
+                </p>
+                <p> "No" responders: 
+                    {% if r.1|get_item:nKey|length > 0 %}
+                        {{ r.1|get_item:nKey }}
+                    {% else %}
+                        None
+                    {% endif %}
+                </p>
+                
+                <div class="overflow-hidden border-2 border-white grid grid-cols-[{{ r.1|get_item:pKey|length }}fr,{{ r.1|get_item:yKey|length }}fr,{{ r.1|get_item:nKey|length }}fr] rounded-lg my-3">
+                    <div class="bg-teal-600 text-white font-bold text-md align-center flex justify-center">
+                        {% if r.1|get_item:pKey|length > 0 %}
+                            <p> {{ r.1|get_item:pKey|length }} </p>
+                        {% endif %}
+                    </div>
+                    <div class="bg-teal-500 text-white font-bold text-md align-center flex justify-center">
+                        {% if r.1|get_item:yKey|length > 0 %}
+                            <p> {{ r.1|get_item:yKey|length }} </p>
+                        {% endif %}
+                    </div>
+                    <div class="bg-slate-400 text-white font-bold text-md align-center flex justify-center">
+                        {% if r.1|get_item:nKey|length > 0 %}
+                            <p> {{ r.1|get_item:nKey|length }} </p>
+                        {% endif %}
+                    </div>
+                </div>
+
+            {% endfor %}
+        </div>
+        
             
         <div class="flex flex-wrap justify-end">
-            
-            <!-- <a href="#" class="block min-w-full sm:min-w-min py-4 px-6 sm:ml-4 my-1 text-center text-black font-semibold border border-gray-300 rounded-xl focus:ring focus:ring-emerald-300 bg-white hover:bg-gray-100 transition ease-in-out duration-200">View Votes</a> -->
             <a href="{% url 'poll-option-create' %}?poll_id={{ object.id }}" class="block min-w-full sm:min-w-min py-4 px-6 sm:ml-4 my-1 text-center text-black font-semibold border border-gray-300 rounded-xl focus:ring focus:ring-emerald-300 bg-white hover:bg-gray-100 transition ease-in-out duration-200">Add an Option</a>
             <a href="{% url 'poll-option-edit' %}?poll_id={{ object.id }}" class="block min-w-full sm:min-w-min py-4 px-6 sm:ml-4 my-1 text-center text-black font-semibold border border-gray-300 rounded-xl focus:ring focus:ring-emerald-300 bg-white hover:bg-gray-100 transition ease-in-out duration-200">Edit Options</a>
             <a href="{% url 'poll-option-delete-list' %}?poll_id={{ object.id }}" class="block min-w-full sm:min-w-min py-4 px-6 sm:ml-4 my-1 text-center text-black font-semibold border border-gray-300 rounded-xl focus:ring focus:ring-emerald-300 bg-white hover:bg-gray-100 transition ease-in-out duration-200">Delete Options</a>
