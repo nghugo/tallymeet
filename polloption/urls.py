@@ -7,5 +7,3 @@ urlpatterns = [
     path("deletelist/", pollOptionDeleteList, name="poll-option-delete-list"),
     path("delete/<int:pk>/", PollOptionDeleteView.as_view(), name="poll-option-delete"),
 ]
-
-

@@ -1,0 +1,21 @@
+{% extends "poll/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="">
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset class="">
+                <legend class="">Join Today</legend>
+                {{ form|crispy }}
+            </fieldset>
+            <div class="">
+                <button class="" type="submit">Sign Up</button>
+            </div>
+        </form>
+        <div class="">
+            <small class="">
+                {% comment %} Already Have An Account? <a class="" href="{% url 'login' %}">Sign In</a> {% endcomment %}
+            </small>
+        </div>
+    </div>
+{% endblock content %}

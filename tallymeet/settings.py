@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     "poll.apps.PollConfig",
     "polloption.apps.PolloptionConfig",
+    "user.apps.UserConfig",
     "crispy_forms",
     "crispy_tailwind",
     "django.contrib.admin",
