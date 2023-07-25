@@ -21,8 +21,9 @@ class UserRegisterForm(UserCreationForm):
     def clean(self):  # extra data validation
         cleaned_data = super().clean()
 
-        email = self.cleaned_data["email"]
-        if User.objects.filter(email=email).exists():
-            raise ValidationError("A user with this email already exists")
-    
+        if "email" in self.cleaned_data:
+            email = self.cleaned_data["email"]
+            if User.objects.filter(email=email).exists():
+                raise ValidationError("A user with this email already exists")
+        
         return cleaned_data

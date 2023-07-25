@@ -4,13 +4,13 @@
     <div class="container px-4 my-4 mx-auto">
         <h1 class="mb-6 text-3xl md:text-4xl lg:max-xl:text-3xl font-bold font-heading leading-none text-center md:text-left">Your Profile</h1>
         <div class="">
-            <h2 class="">{{ user.username }}</h2>
-            <p class="">{{ user.email }}</p>
+            <h2 class="">Username: {{ user.username }}</h2>
+            <p class="">Email: {{ user.email }}</p>
         </div>
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <fieldset class="">
-                <legend class="">Profile Info</legend>
+                {% comment %} <legend class="">Profile Info</legend> {% endcomment %}
                 {% comment %} {{ u_form|crispy }}
                 {{ p_form|crispy }} {% endcomment %}
             </fieldset>
