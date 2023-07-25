@@ -29,7 +29,7 @@ def register(request):
 
 
 def activateEmail(request, user, to_email):  # to_email -> address of recipent ; email -> our email object to send
-    mail_subject = 'Activate your user account.'
+    mail_subject = 'Activate Your Tallymeet User Account'
     message = render_to_string('user/template_activate_account.html', {
         'name': user.username,
         'domain': get_current_site(request).domain,
