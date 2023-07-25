@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 
 class UserRegisterForm(UserCreationForm):
     email = forms.EmailField()
-    display_name = forms.EmailField()
+    display_name = forms.CharField()
     
     def __init__(self, *args, **kwargs):
         super(UserRegisterForm, self).__init__(*args, **kwargs)

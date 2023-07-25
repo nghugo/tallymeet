@@ -134,3 +134,8 @@ CRISPY_TEMPLATE_PACK = "tailwind"
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 SESSION_COOKIE_HTTPONLY = True
 
+# Redirect to profile page after log in
+LOGIN_URL = 'user-login'
+LOGIN_REDIRECT_URL = "user-profile"
+# LOGIN_REDIRECT_URL = "/user-profile/"
+# LOGIN_REDIRECT_URL = "/user/profile/"
