@@ -30,9 +30,6 @@ class PollOptionEditForm(ModelForm):
                 raise ValidationError('Event must not end before start')
         
         return cleaned_data
-    
-        # also need to check for poll permission against poll_id here
-        # TO IMPLEMENT CODE
 
 # docs: https://docs.djangoproject.com/en/4.2/ref/forms/models/#modelformset-factory
 PollOptionEditFormSet = forms.modelformset_factory(

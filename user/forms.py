@@ -18,7 +18,11 @@ class UserRegisterForm(UserCreationForm):
         fields = ['username', 'display_name', 'email', 'password1', 'password2']  
         # password1 password2 docs: https://docs.djangoproject.com/en/4.2/topics/auth/default/#django.contrib.auth.forms.BaseUserCreationForm 
     
-    def clean_email(self):
+    def clean(self):  # extra data validation
+        cleaned_data = super().clean()
+
         email = self.cleaned_data["email"]
         if User.objects.filter(email=email).exists():
             raise ValidationError("A user with this email already exists")
+    
+        return cleaned_data
