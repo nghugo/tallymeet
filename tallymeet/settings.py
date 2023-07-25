@@ -139,3 +139,6 @@ LOGIN_URL = 'user-login'
 LOGIN_REDIRECT_URL = "user-profile"
 # LOGIN_REDIRECT_URL = "/user-profile/"
 # LOGIN_REDIRECT_URL = "/user/profile/"
+
+# Use custom User model
+AUTH_USER_MODEL = 'user.User'
