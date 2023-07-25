@@ -56,7 +56,12 @@
         </div>
         
         <div class="container mt-10 mx-auto">
-            <div class="grid  items-center max-w-min mx-auto sm:mx-0 grid-cols-[1.5rem,1fr,1.5rem,1fr,1.5rem,1fr] my-3">
+
+            <!-- Legend of poll responses (prefer, yes, no) -->
+            {% if rankedResponses|length > 0 %}
+            <h1 class="mb-6 text-3xl md:text-4xl lg:max-xl:text-3xl font-bold font-heading leading-none text-center md:text-left">Poll Options</h1>
+            <p class="mb-2"> The poll options below are ranked by the number of "Yes" responses + "Prefer" responses, followed by the number of "Prefer" responses.
+            <div class="grid  items-center max-w-min mx-auto sm:mx-0 grid-cols-[1.5rem,1fr,1.5rem,1fr,1.5rem,1fr] mb-5">
                 <div class="bg-teal-600 w-4 h-4 mr-1"></div>
                 <p class="mr-4">Prefer</p>
                 <div class="bg-teal-500 w-4 h-4 mr-1"></div>
@@ -64,53 +69,96 @@
                 <div class="bg-slate-400 w-4 h-4 mr-1"></div>
                 <p>No</p>
             </div>
+            {% endif %}
             
+            <!-- Results of poll responses (prefer, yes, no) -->
             {% for r in rankedResponses %}
-                <p> Rank: {{ r.2 }} </p>  <!-- django index i is .i rather than [i] -->
+            <div class="outline outline-2 outline-slate-400 p-2 rounded-lg mb-5">
                 
-                <p> Event start time: {{ r.0.event_start_time }} </p>
-                <p> Event end time:{{ r.0.event_end_time }} </p>
+                <!-- Table of option info -->
+                <p class="block text-gray-500 text-md font-bold mb-2"> Rank: {{ r.2 }} </p>  <!-- django index i is .i rather than [i] -->
+                
+                <div class="py-2 flex flex-col sm:flex-row bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <p class=" pb-1 min-w-[250px] font-medium text-gray-900 whitespace-nowrap dark:text-white"> Event start time </p>
+                    <p> {{ r.0.event_start_time }} </p>
+                </div>
+                
+                <div class="py-2 flex flex-col sm:flex-row bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <p class=" pb-1 min-w-[250px] font-medium text-gray-900 whitespace-nowrap dark:text-white"> Event end time </p>
+                    <p> {{ r.0.event_end_time }} </p>
+                </div>
 
-                <p> "Prefer" responders:
-                    {% if r.1|get_item:pKey|length > 0 %}
-                        {{ r.1|get_item:pKey }}
-                    {% else %}
-                        None
-                    {% endif %}
-                </p>
-                <p> "Yes" responders:
-                    {% if r.1|get_item:yKey|length > 0 %}
-                        {{ r.1|get_item:yKey }}
-                    {% else %}
-                        None
-                    {% endif %}
-                </p>
-                <p> "No" responders: 
-                    {% if r.1|get_item:nKey|length > 0 %}
-                        {{ r.1|get_item:nKey }}
-                    {% else %}
-                        None
-                    {% endif %}
-                </p>
+                <div class="py-2 flex flex-col sm:flex-row bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <p class=" pb-1 min-w-[250px] font-medium text-gray-900 whitespace-nowrap dark:text-white"> "Prefer" responders ({{ r.1|get_item:pKey|length }}) </p>
+                    <p>
+                        {% if r.1|get_item:pKey|length > 0 %}
+                            {% for name in r.1|get_item:pKey %}
+                                {% if forloop.counter < r.1|get_item:pKey|length %}
+                                    <span class="capitalize"> {{name}},&nbsp </span>
+                                {% else %}
+                                    <span class="capitalize"> {{name}} </span>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            None
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div class="py-2 flex flex-col sm:flex-row bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <p class=" pb-1 min-w-[250px] font-medium text-gray-900 whitespace-nowrap dark:text-white"> "Yes" responders ({{ r.1|get_item:yKey|length }}) </p>
+                    <p>
+                        {% if r.1|get_item:yKey|length > 0 %}
+                            {% for name in r.1|get_item:yKey %}
+                                {% if forloop.counter < r.1|get_item:yKey|length %}
+                                    <span class="capitalize"> {{name}},&nbsp </span>
+                                {% else %}
+                                    <span class="capitalize"> {{name}} </span>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            None
+                        {% endif %}
+                    </p>
+                </div>
                 
-                <div class="overflow-hidden border-2 border-white grid grid-cols-[{{ r.1|get_item:pKey|length }}fr,{{ r.1|get_item:yKey|length }}fr,{{ r.1|get_item:nKey|length }}fr] rounded-lg my-3">
-                    <div class="bg-teal-600 text-white font-bold text-md align-center flex justify-center">
+                <div class="py-2 flex flex-col sm:flex-row bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <p class=" pb-1 min-w-[250px] font-medium text-gray-900 whitespace-nowrap dark:text-white"> "No" responders ({{ r.1|get_item:nKey|length }}) </p>
+                    <p>
+                        {% if r.1|get_item:nKey|length > 0 %}
+                            {% for name in r.1|get_item:nKey %}
+                                {% if forloop.counter < r.1|get_item:nKey|length %}
+                                    <span class="capitalize"> {{name}},&nbsp </span>
+                                {% else %}
+                                    <span class="capitalize"> {{name}} </span>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            None
+                        {% endif %}
+                    </p>
+                </div>
+                
+                <!-- Stacked bar chart -->
+                <div class="overflow-hidden border-2 border-white grid grid-cols-[{{ r.1|get_item:pKey|length }}fr,{{ r.1|get_item:yKey|length }}fr,{{ r.1|get_item:nKey|length }}fr] rounded-lg mt-2">
+                    <div class="bg-teal-600 text-white font-bold text-md align-center flex justify-center outline outline-white">
                         {% if r.1|get_item:pKey|length > 0 %}
                             <p> {{ r.1|get_item:pKey|length }} </p>
                         {% endif %}
                     </div>
-                    <div class="bg-teal-500 text-white font-bold text-md align-center flex justify-center">
+                    <div class="bg-teal-500 text-white font-bold text-md align-center flex justify-center outline outline-white">
                         {% if r.1|get_item:yKey|length > 0 %}
                             <p> {{ r.1|get_item:yKey|length }} </p>
                         {% endif %}
                     </div>
-                    <div class="bg-slate-400 text-white font-bold text-md align-center flex justify-center">
+                    <div class="bg-slate-400 text-white font-bold text-md align-center flex justify-center outline outline-white">
                         {% if r.1|get_item:nKey|length > 0 %}
                             <p> {{ r.1|get_item:nKey|length }} </p>
                         {% endif %}
                     </div>
                 </div>
 
+            </div>
             {% endfor %}
         </div>
         
