@@ -68,25 +68,43 @@
               {% block navbar_homepage_ul_links %} {% endblock navbar_homepage_ul_links %}
               
               
-              <!-- navbar log in, register links for wide screens -->
+              <!-- navbar (profile, log out), (register, log in) links for wide screens -->
               <div class="w-auto hidden lg:block mr-3">
                 <div class="inline-block">
+                  {% if user.is_authenticated %}
                   <a 
-                    href="{% url 'user-login' %}"
+                    href="{% url 'user-profile' %}"
                     class="py-3 px-5 text-center w-full text-black font-semibold border border-gray-300 rounded-xl focus:ring focus:ring-emerald-300 bg-white hover:bg-gray-100 transition ease-in-out duration-200"
-                  >
-                    Log In
-                </a>
+                    >
+                      Profile
+                  </a>
+                  {% else %}
+                  <a 
+                    href="{% url 'user-register' %}"
+                    class="py-3 px-5 text-center w-full text-black font-semibold border border-gray-300 rounded-xl focus:ring focus:ring-emerald-300 bg-white hover:bg-gray-100 transition ease-in-out duration-200"
+                    >
+                      Register
+                  </a>
+                  {% endif %}
                 </div>
               </div>
               <div class="w-auto hidden lg:block">
                 <div class="inline-block">
-                  <a
-                    href="{% url 'user-register' %}"
-                    class="py-3 px-5 text-center w-full text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200"
-                  >
-                    Register
-                </a>
+                  {% if user.is_authenticated %}
+                    <a
+                      href="{% url 'user-logout' %}"
+                      class="py-3 px-5 text-center w-full text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200"
+                    >
+                      Log Out
+                    </a>
+                  {% else %}
+                    <a
+                      href="{% url 'user-login' %}"
+                      class="py-3 px-5 text-center w-full text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200"
+                    >
+                      Log In
+                    </a>
+                  {% endif %}
                 </div>
               </div>
               
@@ -178,19 +196,35 @@
               </div>
               <div class="flex flex-col justify-end w-full border-box mb-2">
                 
-                <!-- mobile log in, register links for narrow screens -->
+                <!-- mobile (profile, log out), (register, log in ) links for narrow screens -->
+                  
+                {% if user.is_authenticated %}
                   <a
-                    href="{% url 'user-login' %}"
+                    href="{% url 'user-profile' %}"
                     class="py-3 px-5 mb-2 text-center w-full text-black font-semibold border border-gray-300 rounded-xl focus:ring focus:ring-emerald-300 bg-white hover:bg-gray-100 transition ease-in-out duration-200"
                   >
-                    Log In
-                </a>
+                    Profile
+                  </a>
+                    <a
+                      href="{% url 'user-logout' %}"
+                      class="py-3 px-5 w-full text-center text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200"
+                    >
+                      Log Out
+                  </a>
+                {% else %}
                   <a
                     href="{% url 'user-register' %}"
-                    class="py-3 px-5 w-full text-center text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200"
+                    class="py-3 px-5 mb-2 text-center w-full text-black font-semibold border border-gray-300 rounded-xl focus:ring focus:ring-emerald-300 bg-white hover:bg-gray-100 transition ease-in-out duration-200"
                   >
                     Register
-                </a>
+                  </a>
+                  <a
+                    href="{% url 'user-login' %}"
+                    class="py-3 px-5 w-full text-center text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200"
+                  >
+                    Log In
+                  </a>
+                {% endif %}
               </div>
             </div>
           </nav>
