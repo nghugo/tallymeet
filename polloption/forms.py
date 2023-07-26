@@ -1,6 +1,5 @@
 from django import forms
 from django.forms import ModelForm
-from django.forms.models import BaseModelFormSet, BaseInlineFormSet
 from django.core.exceptions import ValidationError
 from .models import PollOption
 from poll.models import Poll

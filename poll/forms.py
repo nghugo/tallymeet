@@ -1,10 +1,15 @@
 from django import forms
 from django.forms import ModelForm
 from django.core.exceptions import ValidationError
+
+from captcha.fields import ReCaptchaField
+from captcha.widgets import ReCaptchaV3
+
 from .models import Poll
 
 class PollPasswordForm(forms.Form):
     poll_password = forms.CharField(max_length=200, widget=forms.PasswordInput)
+    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")
 
 class PollCreateForm(ModelForm):
     class Meta:
@@ -16,6 +21,7 @@ class PollCreateForm(ModelForm):
     event_location = forms.CharField(label="Event Location (optional)", required=False, help_text='If your event is video-based, consider putting the link here')
     poll_password = forms.CharField(label="Poll Password (optional)", widget=forms.PasswordInput(), help_text='Set and share a poll password so only your group can access this poll', required=False)
     poll_password_confirm = forms.CharField(label="Confirm Poll Password (if entered above)", widget=forms.PasswordInput(), help_text='Please leave blank if a poll password has not been entered above', required=False)
+    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")
 
     def clean(self):
         cleaned_data = super().clean()

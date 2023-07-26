@@ -1,13 +1,17 @@
 from django import forms
-from user.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 
+from captcha.fields import ReCaptchaField
+from captcha.widgets import ReCaptchaV3
+
+from user.models import User
 
 class UserRegisterForm(UserCreationForm):
     email = forms.EmailField()
     display_name = forms.CharField()
-    
+    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")
+        
     def __init__(self, *args, **kwargs):
         super(UserRegisterForm, self).__init__(*args, **kwargs)
         self.fields['display_name'].label = "Display Name"

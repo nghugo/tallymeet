@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "user.apps.UserConfig",
     "crispy_forms",
     "crispy_tailwind",
+    "captcha",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -152,3 +153,7 @@ EMAIL_HOST_PASSWORD = os.environ.get("GMAIL_TALLYMEET_PASS")
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 PASSWORD_RESET_TIMEOUT = 14400
+
+# RECAPTCHA
+RECAPTCHA_PUBLIC_KEY = os.environ.get("TALLYMEET_RECAPTCHA_PUBLIC_KEY")
+RECAPTCHA_PRIVATE_KEY = os.environ.get("TALLYMEET_RECAPTCHA_SECRET_KEY")

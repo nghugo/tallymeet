@@ -1,12 +1,9 @@
 {% autoescape off %}
 Dear {{ name }},
 
-Please click on the link below to complete your user registration:
+Thank you for using Tallymeet. To complete your user registration, please click on the link below:
 
 http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
 
 If this was not you, please do not click on the link and no further action is required.
-
-Thank you for using Tallymeet.
-
 {% endautoescape %}
