@@ -36,3 +36,7 @@ class UserRegisterForm(UserCreationForm):
 
 class RecapAuthenticationForm(AuthenticationForm):
     captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")
+
+class ResendConfirmationForm(forms.Form):
+    email = forms.EmailField()
+    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")

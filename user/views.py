@@ -14,7 +14,7 @@ from django.utils.encoding import force_bytes, force_str
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV3
 
-from .forms import UserRegisterForm, RecapAuthenticationForm
+from .forms import UserRegisterForm, RecapAuthenticationForm, ResendConfirmationForm
 from .tokens import account_activation_token
 from .models import User
 
@@ -46,7 +46,7 @@ def activateEmail(request, user, to_email):  # to_email -> address of recipent ;
         messages.success(request, f'Dear {user.display_name}, please go to the inbox of your email {to_email} and click on \
     the activation link to confirm your email address and complete the registration. You may have to check your spam folder.')
     else:
-        messages.error(request, f'Problem sending confirmation email to {to_email}, please check if you typed it correctly.')
+        messages.error(request, f'Problem sending confirmation email, please check if you typed it correctly.')
 
 def activate(request, uidb64, token):
     try:
@@ -64,6 +64,29 @@ def activate(request, uidb64, token):
     else:
         messages.error(request, 'Activation link is invalid!')
     return redirect('poll-home')
+
+def resend_activation(request):
+    if request.method == 'POST':
+        form = ResendConfirmationForm(request.POST)
+        if form.is_valid():
+
+            email = request.POST.get('email')
+            user = User.objects.filter(email=email).first()  # return None if not found
+            if user and not user.is_active:
+                activateEmail(request, user, form.cleaned_data.get('email'))
+                
+            messages.add_message(request, messages.SUCCESS, f"The activation email has been re-sent, if your provided email {form.cleaned_data.get('email')} is tied to an inactive Tallymeet account.")
+            return redirect('user-login')
+        messages.add_message(request, messages.ERROR, f"Cannot process email {form.cleaned_data.get('email')}, please check if you typed it correctly.")
+    else:  # GET request
+        form = ResendConfirmationForm()
+
+    return render(  # render request in template, and add context to template
+        request, 
+        template_name= 'user/resend_confirmation.html', 
+        context = {'form': form}
+    )
+
 
 @login_required
 def profile(request):

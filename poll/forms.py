@@ -52,5 +52,5 @@ class PollUpdatePasswordForm(ModelForm):
                 raise ValidationError('New poll passwords do not match')
 
         
-    
+
     
