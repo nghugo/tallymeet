@@ -22,7 +22,7 @@ class UserRegisterForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ['username', 'display_name', 'email', 'password1', 'password2']  
+        fields = ['email', 'display_name', 'password1', 'password2']  
         # password1 password2 docs: https://docs.djangoproject.com/en/4.2/topics/auth/default/#django.contrib.auth.forms.BaseUserCreationForm 
     
     def clean(self):  # extra data validation

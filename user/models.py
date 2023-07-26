@@ -33,13 +33,17 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 class User(AbstractUser):  # use email as username https://koenwoortman.com/python-django-email-as-username/
+    username = None
     display_name = models.CharField(max_length=255)
     email = models.EmailField(max_length=320, unique=True)
     USERNAME_FIELD = 'email'
-
+    
     objects = UserManager()
 
     REQUIRED_FIELDS = []  # exclude the USERNAME_FIELD from this list https://koenwoortman.com/python-django-email-as-username/
 
+
     def __str__(self):
-        return self.username
+        if not self.display_name:
+            return f"{self.email} (no name)"
+        return f"{self.email} ({self.display_name})"
