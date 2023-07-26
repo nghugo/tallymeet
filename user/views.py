@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import views as auth_views
 
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
@@ -10,7 +11,10 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 
-from .forms import UserRegisterForm
+from captcha.fields import ReCaptchaField
+from captcha.widgets import ReCaptchaV3
+
+from .forms import UserRegisterForm, RecapAuthenticationForm
 from .tokens import account_activation_token
 from .models import User
 
@@ -55,7 +59,7 @@ def activate(request, uidb64, token):
         user.is_active = True
         user.save()
 
-        messages.success(request, 'Thank you for your email confirmation. Now you can login your account.')
+        messages.success(request, 'Thank you for your email confirmation. You may log in now.')
         return redirect('user-login')
     else:
         messages.error(request, 'Activation link is invalid!')
@@ -64,3 +68,6 @@ def activate(request, uidb64, token):
 @login_required
 def profile(request):
     return render(request, 'user/profile.html')
+
+class RecapLoginView(auth_views.LoginView):
+    form_class = RecapAuthenticationForm

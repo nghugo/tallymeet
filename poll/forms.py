@@ -11,6 +11,7 @@ class PollPasswordForm(forms.Form):
     poll_password = forms.CharField(max_length=200, widget=forms.PasswordInput)
     captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")
 
+
 class PollCreateForm(ModelForm):
     class Meta:
         model = Poll
