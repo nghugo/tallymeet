@@ -31,7 +31,7 @@ def register(request):
 def activateEmail(request, user, to_email):  # to_email -> address of recipent ; email -> our email object to send
     mail_subject = 'Activate Your Tallymeet User Account'
     message = render_to_string('user/template_activate_account.html', {
-        'name': user.username,
+        'name': user.display_name,
         'domain': get_current_site(request).domain,
         'uid': urlsafe_base64_encode(force_bytes(user.pk)),
         'token': account_activation_token.make_token(user),
@@ -39,7 +39,7 @@ def activateEmail(request, user, to_email):  # to_email -> address of recipent ;
     })
     email = EmailMessage(mail_subject, message, to=[to_email])
     if email.send():
-        messages.success(request, f'Dear {user}, please go to the inbox of your email {to_email} and click on \
+        messages.success(request, f'Dear {user.display_name}, please go to the inbox of your email {to_email} and click on \
     the activation link to confirm your email address and complete the registration. You may have to check your spam folder.')
     else:
         messages.error(request, f'Problem sending confirmation email to {to_email}, please check if you typed it correctly.')
