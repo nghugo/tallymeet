@@ -12,42 +12,27 @@ ul.messages li {
   font-weight: 500;
 }
 ul.messages li.debug {
-  --tw-border-opacity: 1;
-  border-color: rgb(148 163 184 / var(--tw-border-opacity));
-  --tw-bg-opacity: 1;
-  background-color: rgb(241 245 249 / var(--tw-bg-opacity));
-  --tw-text-opacity: 1;
-  color: rgb(71 85 105 / var(--tw-text-opacity));
+  border-color: rgb(148 163 184 / 1);
+  background-color: rgb(241 245 249 / 1);
+  color: rgb(71 85 105 / 1);
 }
 ul.messages li.info {
-  --tw-border-opacity: 1;
-  border-color: rgb(56 189 248 / var(--tw-border-opacity));
-  --tw-bg-opacity: 1;
-  background-color: rgb(224 242 254 / var(--tw-bg-opacity));
-  --tw-text-opacity: 1;
-  color: rgb(2 132 199 / var(--tw-text-opacity));
+  border-color: rgb(56 189 248 / 1);
+  background-color: rgb(224 242 254 / 1);
+  color: rgb(2 132 199 / 1);
 }
 ul.messages li.success {
-  --tw-border-opacity: 1;
-  border-color: rgb(74 222 128 / var(--tw-border-opacity));
-  --tw-bg-opacity: 1;
-  background-color: rgb(220 252 231 / var(--tw-bg-opacity));
-  --tw-text-opacity: 1;
-  color: rgb(22 163 74 / var(--tw-text-opacity));
+  border-color: rgb(102, 231, 149);
+  background-color: rgb(220 252 231 / 1);
+  color: rgb(11, 100, 44);
 }
 ul.messages li.warning {
-  --tw-border-opacity: 1;
-  border-color: rgb(251 191 36 / var(--tw-border-opacity));
-  --tw-bg-opacity: 1;
-  background-color: rgb(254 243 199 / var(--tw-bg-opacity));
-  --tw-text-opacity: 1;
-  color: rgb(217 119 6 / var(--tw-text-opacity));
+  border-color: rgb(251 191 36 / 1);
+  background-color: rgb(254 243 199 / 1);
+  color: rgb(217 119 6 / 1);
 }
 ul.messages li.error {
-  --tw-border-opacity: 1;
-  border-color: rgb(248 113 113 / var(--tw-border-opacity));
-  --tw-bg-opacity: 1;
-  background-color: rgb(254 226 226 / var(--tw-bg-opacity));
-  --tw-text-opacity: 1;
-  color: rgb(220 38 38 / var(--tw-text-opacity));
+  border-color: rgb(254, 143, 143);
+  background-color: rgb(254 226 226 / 1);
+  color: rgb(220 38 38 / 1);
 }
