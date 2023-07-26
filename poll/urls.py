@@ -11,6 +11,6 @@ urlpatterns = [
     path("poll/create/", PollCreateView.as_view(), name="poll-create"),
     path("poll/detail/<int:pk>/", PollDetailView.as_view(), name="poll-detail"),
     path("poll/update/<int:pk>/", PollUpdateView.as_view(), name="poll-update"),
-    path("poll/update_password/<int:pk>/", PollUpdatePasswordView.as_view(), name="poll-update-password"),
+    path("poll/password_update/<int:pk>/", PollUpdatePasswordView.as_view(), name="poll-update-password"),
     path("poll/delete/<int:pk>/", PollDeleteView.as_view(), name="poll-delete"),
 ]

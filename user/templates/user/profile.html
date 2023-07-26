@@ -7,17 +7,8 @@
             <h2 class="">Username: {{ user.username }}</h2>
             <p class="">Email: {{ user.email }}</p>
         </div>
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <fieldset class="">
-                {% comment %} <legend class="">Profile Info</legend> {% endcomment %}
-                {% comment %} {{ u_form|crispy }}
-                {{ p_form|crispy }} {% endcomment %}
-            </fieldset>
-            <div class="flex flex-col sm:flex-row flex-wrap justify-center sm:justify-end items-center px-4">
-                <button class="block min-w-full sm:min-w-min py-4 px-6 sm:ml-4 my-1 text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200" type="submit">Update</button>
-            </div>
-        </form>
-        
+        <div class="flex flex-wrap justify-end">
+            <a href="{% url 'user-password-change' %}" class="block min-w-full sm:min-w-min py-4 px-6 sm:ml-4 my-1 text-center text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200">Update Account Password</a>
+        </div>
     </div>
 {% endblock content %}

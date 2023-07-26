@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.forms import SetPasswordForm
 
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
@@ -94,3 +95,20 @@ def profile(request):
 
 class RecapLoginView(auth_views.LoginView):
     form_class = RecapAuthenticationForm
+
+
+@login_required
+def password_update(request):
+    user = request.user
+    if request.method == 'POST':
+        form = SetPasswordForm(user, request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your password has been changed")
+            return redirect('user-login')
+        else:
+            for error in list(form.errors.values()):
+                messages.error(request, error)
+
+    form = SetPasswordForm(user)
+    return render(request, 'user/password_update.html', {'form': form})
