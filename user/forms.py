@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.forms import SetPasswordForm
 
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV3
@@ -39,4 +41,17 @@ class RecapAuthenticationForm(AuthenticationForm):
 
 class ResendConfirmationForm(forms.Form):
     email = forms.EmailField()
+    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")
+
+class PasswordResetForm(PasswordResetForm):
+    def __init__(self, *args, **kwargs):
+        super(PasswordResetForm, self).__init__(*args, **kwargs)
+
+    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")
+
+class SetPasswordForm(SetPasswordForm):
+    class Meta:
+        model = User
+        fields = ['new_password1', 'new_password2']
+    
     captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")
