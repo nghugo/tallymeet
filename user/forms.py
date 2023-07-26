@@ -1,9 +1,9 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,
+                                       PasswordResetForm, SetPasswordForm)
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.forms import PasswordResetForm
-from django.contrib.auth.forms import SetPasswordForm
+from django.forms import ModelForm
 
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV3
@@ -11,8 +11,8 @@ from captcha.widgets import ReCaptchaV3
 from user.models import User
 
 class UserRegisterForm(UserCreationForm):
-    email = forms.EmailField()
-    display_name = forms.CharField()
+    email = forms.EmailField(max_length=320)
+    display_name = forms.CharField(max_length=255)
     captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")
         
     def __init__(self, *args, **kwargs):
@@ -53,5 +53,12 @@ class SetPasswordForm(SetPasswordForm):
     class Meta:
         model = User
         fields = ['new_password1', 'new_password2']
-    
+
     captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")
+
+class SetDisplayNameForm(ModelForm):
+    display_name = forms.CharField(max_length=255)
+    class Meta:
+        model = User
+        fields = ['display_name']
+    

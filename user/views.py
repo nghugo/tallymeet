@@ -14,7 +14,7 @@ from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV3
 
 from .forms import (UserRegisterForm, RecapAuthenticationForm, ResendConfirmationForm, 
-                    PasswordResetForm, SetPasswordForm)
+                    PasswordResetForm, SetPasswordForm, SetDisplayNameForm)
 from .tokens import account_activation_token
 from .models import User
 
@@ -48,6 +48,7 @@ def activateEmail(request, user, to_email):  # to_email -> address of recipent ;
     else:
         messages.error(request, f'Problem sending confirmation email, please check if you typed it correctly.')
 
+
 def activate(request, uidb64, token):
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
@@ -64,6 +65,7 @@ def activate(request, uidb64, token):
     else:
         messages.error(request, 'Activation link is invalid!')
     return redirect('poll-home')
+
 
 def resend_activation(request):
     if request.method == 'POST':
@@ -91,9 +93,11 @@ def resend_activation(request):
 class RecapLoginView(auth_views.LoginView):  # Just the login view with Google reCAPTCHA added
     form_class = RecapAuthenticationForm
 
+
 @login_required
 def profile(request):
     return render(request, 'user/profile.html')
+
 
 @login_required
 def password_update(request):
@@ -103,13 +107,29 @@ def password_update(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Your password has been changed successfully")
-            return redirect('user-login')
+            return redirect('user-profile')
         else:
             for error in list(form.errors.values()):
                 messages.error(request, error)
 
     form = SetPasswordForm(user)
-    return render(request, 'user/password_update.html', {'form': form})
+    return render(request, 'user/displayname_or_password_update.html', {'form': form, 'subheading': 'Password'})
+
+@login_required
+def displayname_update(request):
+    user = request.user
+    if request.method == 'POST':
+        form = SetDisplayNameForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()        
+            messages.success(request, "Your display name has been changed successfully")
+            return redirect('user-profile')
+        else:
+            for error in list(form.errors.values()):
+                messages.error(request, error)
+    form = SetDisplayNameForm(instance=request.user)
+    return render(request, 'user/displayname_or_password_update.html', {'form': form, 'subheading': 'Display Name'})
+
 
 def passwordResetRequest(request):
     if request.method == 'POST':
