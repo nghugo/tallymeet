@@ -1,0 +1,13 @@
+{% autoescape off %}
+Dear {{ name }},
+
+We received a request to delete your Tallymeet account associated with this email. To complete the deletion process, please click the link below.
+
+{{ protocol }}://{{ domain }}{% url 'user-delete-confirm' uidb64=uid token=token %}
+
+If you did not make this request, you can simply ignore this email.
+
+Sincerely,
+Tallymeet
+
+{% endautoescape %}

@@ -1,5 +1,7 @@
 from django.urls import path
-from .views import register, profile, activate, RecapLoginView, resend_activation, password_update, displayname_update, passwordResetRequest, passwordResetConfirm
+from .views import (register, profile, activate, RecapLoginView, resend_activation, 
+                    password_update, displayname_update, passwordResetRequest, 
+                    passwordResetConfirm, userDeleteRequest, userDeleteConfirm)
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
@@ -13,6 +15,8 @@ urlpatterns = [
     path("displayname_update/", displayname_update, name="user-displayname-change"),
     path("password_reset_request", passwordResetRequest, name="user-password-reset-request"),
     path('reset/<uidb64>/<token>', passwordResetConfirm, name='user-password-reset-confirm'),
+    path("delete/", userDeleteRequest, name="user-delete-request"), 
+    path('delete/<uidb64>/<token>', userDeleteConfirm, name='user-delete-confirm'),
 ]
 
 

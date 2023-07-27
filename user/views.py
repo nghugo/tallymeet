@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import check_password
 from django.contrib.auth import views as auth_views
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMessage
@@ -14,7 +15,8 @@ from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV3
 
 from .forms import (UserRegisterForm, RecapAuthenticationForm, ResendConfirmationForm, 
-                    PasswordResetForm, SetPasswordForm, SetDisplayNameForm)
+                    PasswordResetForm, SetPasswordForm, SetDisplayNameForm,
+                    UserDeleteRequestForm, UserDeleteConfirmForm)
 from .tokens import account_activation_token
 from .models import User
 
@@ -115,6 +117,7 @@ def password_update(request):
     form = SetPasswordForm(user)
     return render(request, 'user/displayname_or_password_update.html', {'form': form, 'subheading': 'Password'})
 
+
 @login_required
 def displayname_update(request):
     user = request.user
@@ -138,7 +141,7 @@ def passwordResetRequest(request):
             user_email = form.cleaned_data['email']
             associated_user = User.objects.filter(Q(email=user_email)).first()
             if associated_user:
-                subject = "Password Reset Request"
+                subject = "Password Reset Your Tallymeet User Account"
                 message = render_to_string("user/template_reset_password.html", {
                     'name': associated_user.display_name,
                     'domain': get_current_site(request).domain,
@@ -198,3 +201,76 @@ def passwordResetConfirm(request, uidb64, token):
 
     messages.error(request, 'Something went wrong, redirecting back to home page')
     return redirect("poll-home")
+
+
+@login_required
+def userDeleteRequest(request):
+    if request.method == 'POST':
+        form = UserDeleteRequestForm(request.POST)
+        if form.is_valid():
+            subject = "Delete Your Tallymeet User Account"
+            message = render_to_string("user/template_delete_account.html", {
+                'name': request.user.display_name,
+                'domain': get_current_site(request).domain,
+                'uid': urlsafe_base64_encode(force_bytes(request.user.pk)),
+                'token': account_activation_token.make_token(request.user),
+                "protocol": 'https' if request.is_secure() else 'http'
+            })
+            email = EmailMessage(subject, message, to=[request.user.email])
+            if email.send():
+                messages.success(request,
+                    """
+                    We have emailed you instructions for deleting your account. 
+                    You may need to check your spam folder.
+                    """
+                )
+            else:
+                messages.error(request, "Problem sending reset password email (server problem)")
+
+            return redirect('user-profile')
+
+        for key, error in list(form.errors.items()):
+            if key == 'captcha' and error[0] == 'This field is required.':
+                messages.error(request, "You must pass the reCAPTCHA test")
+                continue
+
+    form = UserDeleteRequestForm()
+    return render(
+        request=request, 
+        template_name="user/user_delete_request.html", 
+        context={"form": form}
+        )
+
+@login_required
+def userDeleteConfirm(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except:
+        user = None
+
+    if user is not None and account_activation_token.check_token(user, token):
+        if request.method == 'POST':
+            form = UserDeleteConfirmForm(request.POST)
+            if form.is_valid():
+                password_user_entered = form.cleaned_data['password']
+                if check_password(password_user_entered, request.user.password):
+                    user.delete()
+                    messages.success(request, "Your account has been deleted.")
+                    return redirect('poll-home')
+                messages.error(request, "Password incorrect")
+            for error in list(form.errors.values()):
+                messages.error(request, error)
+        else:
+            form = UserDeleteConfirmForm()
+        return render(
+            request=request, 
+            template_name="user/user_delete_confirm.html", 
+            context={"form": form}
+        )
+
+    elif user is not None:
+        messages.error(request, "Link is expired")
+    else:
+        messages.error(request, "User does not exist, redirecting back to home page")
+        return redirect("poll-home")

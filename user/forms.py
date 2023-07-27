@@ -1,9 +1,10 @@
 from django import forms
 from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,
                                        PasswordResetForm, SetPasswordForm)
+from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import AuthenticationForm
-from django.forms import ModelForm
+from django.forms import ModelForm, Form
 
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV3
@@ -61,4 +62,11 @@ class SetDisplayNameForm(ModelForm):
     class Meta:
         model = User
         fields = ['display_name']
-    
+
+class UserDeleteRequestForm(Form):
+    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")
+
+class UserDeleteConfirmForm(Form):
+    password = forms.CharField(label="Account Password", widget=forms.PasswordInput(), help_text='Please enter your account password to confirm account deletion')
+    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")
+
