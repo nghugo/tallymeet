@@ -67,6 +67,7 @@ class PollVoteForm(ModelForm):
 PollVoteFormSet = modelformset_factory(
     model = PollOptionResponse,
     form = PollVoteForm, 
+    exclude = None,
     extra = 3,
 )
 

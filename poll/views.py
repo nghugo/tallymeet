@@ -267,33 +267,37 @@ def vote(request, pk):
     
     if request.method == 'POST':
 
-        # DEBUG
-        testform = PollVoteForm(request.POST, initial={'poll_id' : pk, 'responder_id': request.user.id})
+        # # DEBUG
+        # testform = PollVoteForm(request.POST, initial={'poll_id' : pk, 'responder_id': request.user.id})
         
         # formset = PollVoteFormSet(request.POST, initial={'poll_id' : pk, 'responder_id': request.user.id})
+        formset = PollVoteFormSet(request.POST)
         extraForm = PollVoteExtraForm(request.POST)
         
-        # if formset.is_valid() and extraForm.is_valid():
+        if formset.is_valid() and extraForm.is_valid():
+            formset.save()
             # DO SOMETHING with poll_id
         
-        if testform.is_valid() and extraForm.is_valid():
-            testform.save()    
-            return redirect("poll-detail", pk=pk)
-        print("*****************")
-        print("invalid form")
-        print(testform.is_valid())
+        # # DEBUG
+        # if testform.is_valid() and extraForm.is_valid():
+        #     testform.save()    
+        #     return redirect("poll-detail", pk=pk)
 
-        # for error in list(formset.errors.values()):
+        # for error in list(testform.errors.values()):
         #     messages.error(request, error)
-        for error in list(testform.errors.values()):
+
+        for error in list(formset.errors.values()):
             messages.error(request, error)
         for error in list(extraForm.errors.values()):
             messages.error(request, error)
+
     else:  # GET request
         # DEBUG
         testform = PollVoteForm()
 
-        formset = PollVoteFormSet(initial={'poll_id' : pk, 'responder_id': request.user.id})
+        # formset = PollVoteFormSet(initial={'poll_id' : pk, 'responder_id': request.user.id})
+        formset = PollVoteFormSet()
+
         extraForm = PollVoteExtraForm()
         
         # print("*******************")
@@ -301,9 +305,8 @@ def vote(request, pk):
         # # print(extraForm)
         # print(testform)
     
-
     # DEBUG
-    # return render(request, 'poll/poll_vote.html', {'formset': formset, 'extraForm': extraForm, 'pk': pk, 'testform': testform})
+    return render(request, 'poll/poll_vote.html', {'formset': formset, 'extraForm': extraForm, 'pk': pk})
     
-    return render(request, 'poll/poll_vote.html', {'extraForm': extraForm, 'pk': pk, 'testform': testform})
+    # return render(request, 'poll/poll_vote.html', {'extraForm': extraForm, 'pk': pk, 'testform': testform})
      
