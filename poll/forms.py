@@ -1,11 +1,12 @@
 from django import forms
-from django.forms import ModelForm
+from django.forms import ModelForm, modelformset_factory, Form
 from django.core.exceptions import ValidationError
 
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV3
 
 from .models import Poll
+from polloption.models import PollOptionResponse
 
 class PollPasswordForm(forms.Form):
     poll_password = forms.CharField(max_length=200, widget=forms.PasswordInput)
@@ -51,6 +52,25 @@ class PollUpdatePasswordForm(ModelForm):
             if poll_password != poll_password_confirm:
                 raise ValidationError('New poll passwords do not match')
 
+class PollVoteForm(ModelForm):
+    class Meta:
+        model = PollOptionResponse
+        # poll_id is a hiddenfield to be filled in using poll_id in url
+        # to prevent tampering, also need to check for permission (against poll password of poll_id)        
+        fields = "__all__"
         
+    response = forms.ChoiceField(widget=forms.RadioSelect,
+                                 choices = PollOptionResponse.RESPONSE_CHOICES)
+    # responder_name = forms.CharField(required=False, widget = forms.HiddenInput())  # fill in using main_responder_name during form submission
+    responder_name = forms.CharField(required=False)  # fill in using main_responder_name during form submission
 
-    
+PollVoteFormSet = modelformset_factory(
+    model = PollOptionResponse,
+    form = PollVoteForm, 
+    extra = 3,
+)
+
+
+class PollVoteExtraForm(Form):
+    main_responder_name = forms.CharField(required=True)  # allow user to modify
+    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")

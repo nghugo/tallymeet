@@ -7,13 +7,13 @@ from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponseForbidden
 
-from .forms import PollPasswordForm, PollCreateForm, PollUpdatePasswordForm
+from .forms import (PollPasswordForm, PollCreateForm, PollUpdatePasswordForm, 
+                    PollVoteFormSet, PollVoteExtraForm, PollVoteForm)
 from .models import Poll
 from .views_helper import getSavedPollPassword, getRankedResponses, addDenseRank
 from .views_helper import get_item  # not explicitly called, but required for dictionary query inside template of DetailView 
 
 from polloption.models import PollOption, PollOptionResponse
-
 
 
 def home(request):
@@ -261,3 +261,49 @@ class PollDeleteView(SuccessMessageMixin, DeleteView):
         if poll_password_hashed and (not entered_password or not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed)):
             return HttpResponseForbidden()
         return super().post(request, *args, **kwargs)
+
+
+def vote(request, pk):
+    
+    if request.method == 'POST':
+
+        # DEBUG
+        testform = PollVoteForm(request.POST, initial={'poll_id' : pk, 'responder_id': request.user.id})
+        
+        # formset = PollVoteFormSet(request.POST, initial={'poll_id' : pk, 'responder_id': request.user.id})
+        extraForm = PollVoteExtraForm(request.POST)
+        
+        # if formset.is_valid() and extraForm.is_valid():
+            # DO SOMETHING with poll_id
+        
+        if testform.is_valid() and extraForm.is_valid():
+            testform.save()    
+            return redirect("poll-detail", pk=pk)
+        print("*****************")
+        print("invalid form")
+        print(testform.is_valid())
+
+        # for error in list(formset.errors.values()):
+        #     messages.error(request, error)
+        for error in list(testform.errors.values()):
+            messages.error(request, error)
+        for error in list(extraForm.errors.values()):
+            messages.error(request, error)
+    else:  # GET request
+        # DEBUG
+        testform = PollVoteForm()
+
+        formset = PollVoteFormSet(initial={'poll_id' : pk, 'responder_id': request.user.id})
+        extraForm = PollVoteExtraForm()
+        
+        # print("*******************")
+        # # print(formset)
+        # # print(extraForm)
+        # print(testform)
+    
+
+    # DEBUG
+    # return render(request, 'poll/poll_vote.html', {'formset': formset, 'extraForm': extraForm, 'pk': pk, 'testform': testform})
+    
+    return render(request, 'poll/poll_vote.html', {'extraForm': extraForm, 'pk': pk, 'testform': testform})
+     
