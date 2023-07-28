@@ -355,6 +355,10 @@ def vote(request, pk):
             messages.add_message(request, messages.WARNING, "Warning: You are voting as a guest since you have not logged in. Hence, you cannot modify these votes if you use another web session.")
         else:
             messages.add_message(request, messages.INFO, f"You are voting as {request.user.display_name}, though you can modify the name below.")
+        
+        if pollOptionUserResponses:
+            messages.add_message(request, messages.INFO, "You have already voted. Voting again will overwrite the previous vote.")
+
     return render(
         request, 'poll/poll_vote.html',
         {'oAndVoteForms': oAndVoteForms,

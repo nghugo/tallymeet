@@ -12,27 +12,27 @@ ul.messages li {
   font-weight: 500;
 }
 ul.messages li.debug {
-  border-color: rgb(148 163 184 / 1);
-  background-color: rgb(241 245 249 / 1);
-  color: rgb(71 85 105 / 1);
+  border-color: rgb(148 163 184);
+  background-color: rgb(241 245 249);
+  color: rgb(71 85 105);
 }
 ul.messages li.info {
-  border-color: rgb(56 189 248 / 1);
-  background-color: rgb(224 242 254 / 1);
-  color: rgb(2 132 199 / 1);
+  border-color: rgb(56 189 248);
+  background-color: rgb(224 242 254);
+  color: rgb(2 132 199);
 }
 ul.messages li.success {
   border-color: rgb(102, 231, 149);
-  background-color: rgb(220 252 231 / 1);
+  background-color: rgb(220 252 231);
   color: rgb(11, 100, 44);
 }
 ul.messages li.warning {
-  border-color: rgb(251 191 36 / 1);
-  background-color: rgb(254 243 199 / 1);
-  color: rgb(217 119 6 / 1);
+  border-color: rgb(228, 172, 31);
+  background-color: rgb(252, 243, 207);
+  color: rgb(198, 108, 5);
 }
 ul.messages li.error {
   border-color: rgb(254, 143, 143);
-  background-color: rgb(254 226 226 / 1);
-  color: rgb(220 38 38 / 1);
+  background-color: rgb(254 226 226);
+  color: rgb(220 38 38);
 }
