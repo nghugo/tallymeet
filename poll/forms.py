@@ -54,7 +54,7 @@ class PollUpdatePasswordForm(ModelForm):
 
 class PollVoteForm(Form):
     
-    poll_option_id = forms.ChoiceField(choices = PollOption.objects.all())  # disable and initialize as poll options of the poll later
+    poll_option_id = forms.ModelChoiceField(queryset = PollOption.objects.all())  # disable and initialize as poll options of the poll later
     responder_id = forms.CharField()
     responder_name = forms.CharField(required=False)  # fill in using main_responder_name during form submission
     # responder_name = forms.CharField(required=False, widget = forms.HiddenInput())  # fill in using main_responder_name during form submission

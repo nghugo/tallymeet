@@ -13,8 +13,8 @@
 
                 <div class="p-6 outline outline-red-600">
                     {% for voteForm in voteForms %}
-                        {% comment %} {{ voteForm|crispy }}  <!-- loop over form fields later to CSS style --> {% endcomment %}
-                        {{ voteForm}}  <!-- loop over form fields later to CSS style -->
+                        {{ voteForm|crispy }}  <!-- loop over form fields later to CSS style -->
+                        {% comment %} {{ voteForm}}  <!-- loop over form fields later to CSS style --> {% endcomment %}
                         <!-- also disable crispy for now -->
                     {% endfor %}
                 </div>

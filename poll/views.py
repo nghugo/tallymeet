@@ -278,14 +278,7 @@ def vote(request, pk):
 
     pollOptions = PollOption.objects.filter(poll_id = pk)
 
-    print("*_*_*_*_*_**_*_*_*_*_*_*_")
-    print(pollOptions)
-    for o in pollOptions:
-        print(o)
-    print("*_*_*_*_*_**_*_*_*_*_*_*_")
-
     pollOptionUserResponses = PollOptionResponse.objects.filter(poll_option_id__in = pollOptions, responder_id = UserID)
-    
 
     if request.method == 'POST':
         voteForms = []
@@ -318,16 +311,12 @@ def vote(request, pk):
             voteForm = PollVoteForm()
             # , initial={'poll_id' : pk, 'responder_id': request.user.id}
             voteForms.append(voteForm)
-            print(voteForm)
+            print(voteForm.is_bound)
+            # print(voteForm)
         extraForm = PollVoteExtraForm()
-    
-    print("******************")
-    # for voteForm in voteForms:
-    #     print(voteForm)
-    print("******************")
 
     # DEBUG
-    return render(request, 'poll/poll_home.html')
+    # return render(request, 'poll/home.html')
     return render(request, 'poll/poll_vote.html', {'voteForms': voteForms, 'extraForm': extraForm, 'pk': pk})
     
     # return render(request, 'poll/poll_vote.html', {'extraForm': extraForm, 'pk': pk, 'testform': testform})
