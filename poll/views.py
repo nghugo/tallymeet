@@ -12,7 +12,8 @@ from django.http import HttpResponseForbidden
 from .forms import (PollPasswordForm, PollCreateForm, PollUpdatePasswordForm, 
                     PollVoteResponderMetaForm, PollVoteForm)
 from .models import Poll
-from .views_helper import getSavedPollPassword, getRankedResponses, addDenseRank
+from .views_helper import (getSavedPollPassword, getRankedResponses, 
+                           addDenseRank, getExisting_pollOptionUserResponses)
 from .views_helper import get_item  # not explicitly called, but required for dictionary query inside template of DetailView 
 
 from polloption.models import PollOption, PollOptionResponse
@@ -267,25 +268,7 @@ class PollDeleteView(SuccessMessageMixin, DeleteView):
 
 
 
-# filter out existing pollOptionUserResponses in database
-def getExisting_pollOptionUserResponses(request, pollOptions):
-    """
-        Given poll options and the user making the request (via the request object), 
-        return the poll option responses that belong to the user making the request
-        If this user is anonymous -> ID by uuid4
-        If this user is authenticated -> ID by user.id
-    """
-    if not request.user.is_authenticated:
-        pollOptionUserResponses = PollOptionResponse.objects.filter(
-            poll_option_id__in = pollOptions, 
-            responder_nonuser_id = request.session["nonUserId"]
-        )
-    else:
-        pollOptionUserResponses = PollOptionResponse.objects.filter(
-            poll_option_id__in = pollOptions, 
-            responder_user_id = request.user.id
-        )
-    return pollOptionUserResponses
+
 
 
 def vote(request, pk):
@@ -334,14 +317,37 @@ def vote(request, pk):
     else:  # GET request
         oAndVoteForms = []
 
+        pollOptionUserResponses = getExisting_pollOptionUserResponses(request, pollOptions)
+        pollOption_To_pollOptionUserResponse = {r.poll_option_id: r.response for r in pollOptionUserResponses}
+        
+
+        # print("***********************")
+        # if pollOptionUserResponses:
+        #     prevName = pollOptionUserResponses[0].responder_name
+        #     print(f"name found: {prevName}")
+        # else:
+        #     print("no name")
+            
+        # for k, v in pollOption_To_pollOptionUserResponse.items():
+        #     print(f"key: {k}")
+        #     print(f"val: {v}")
+        # print("***********************")
+
         for index, o in enumerate(pollOptions):
-            voteForm = PollVoteForm(initial={'poll_option_id' : o}, prefix=str(index))
+            voteForm = PollVoteForm(
+                initial = {
+                    'poll_option_id' : o,
+                    'response': pollOption_To_pollOptionUserResponse[o],
+                }, 
+                prefix = str(index)
+            )
             oAndVoteForms.append((o, voteForm))
-        metaForm = PollVoteResponderMetaForm(initial={
+        metaForm = PollVoteResponderMetaForm(initial = {
             'responder_user_id': request.user.id if request.user.is_authenticated else None, 
             'responder_nonuser_id': request.session["nonUserId"] if not request.user.is_authenticated else None, 
-            
-            'responder_name': request.user.display_name if request.user.is_authenticated else None,
+            'responder_name': request.user.display_name if request.user.is_authenticated \
+                else pollOptionUserResponses[0].responder_name if pollOptionUserResponses \
+                else None,
         })
         if not request.user.is_authenticated:
             messages.add_message(request, messages.WARNING, "Warning: You are voting as a guest since you have not logged in. Hence, you cannot modify these votes if you use another web session.")

@@ -118,3 +118,24 @@ def get_item(dictionary, key):
     https://stackoverflow.com/questions/8000022/django-template-how-to-look-up-a-dictionary-value-with-a-variable
     """
     return dictionary.get(key)
+
+
+# filter out existing pollOptionUserResponses in database
+def getExisting_pollOptionUserResponses(request, pollOptions):
+    """
+        Given poll options and the user making the request (via the request object), 
+        return the poll option responses that belong to the user making the request
+        If this user is anonymous -> ID by uuid4
+        If this user is authenticated -> ID by user.id
+    """
+    if not request.user.is_authenticated:
+        pollOptionUserResponses = PollOptionResponse.objects.filter(
+            poll_option_id__in = pollOptions, 
+            responder_nonuser_id = request.session["nonUserId"]
+        )
+    else:
+        pollOptionUserResponses = PollOptionResponse.objects.filter(
+            poll_option_id__in = pollOptions, 
+            responder_user_id = request.user.id
+        )
+    return pollOptionUserResponses
