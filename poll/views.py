@@ -337,7 +337,7 @@ def vote(request, pk):
             voteForm = PollVoteForm(
                 initial = {
                     'poll_option_id' : o,
-                    'response': pollOption_To_pollOptionUserResponse[o],
+                    'response': pollOption_To_pollOptionUserResponse[o] if pollOption_To_pollOptionUserResponse else None,  # Prepopulate with previously entered responses
                 }, 
                 prefix = str(index)
             )
@@ -345,6 +345,8 @@ def vote(request, pk):
         metaForm = PollVoteResponderMetaForm(initial = {
             'responder_user_id': request.user.id if request.user.is_authenticated else None, 
             'responder_nonuser_id': request.session["nonUserId"] if not request.user.is_authenticated else None, 
+            
+            # if user is not logged in and they have already responsed to the poll, then grab the responder_name
             'responder_name': request.user.display_name if request.user.is_authenticated \
                 else pollOptionUserResponses[0].responder_name if pollOptionUserResponses \
                 else None,
