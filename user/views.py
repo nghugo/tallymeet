@@ -110,9 +110,6 @@ def password_update(request):
             form.save()
             messages.success(request, "Your password has been changed successfully")
             return redirect('user-profile')
-        else:
-            for error in list(form.errors.values()):
-                messages.error(request, error)
 
     form = SetPasswordForm(user)
     return render(request, 'user/displayname_or_password_update.html', {'form': form, 'subheading': 'Password'})
@@ -127,9 +124,7 @@ def displayname_update(request):
             form.save()        
             messages.success(request, "Your display name has been changed successfully")
             return redirect('user-profile')
-        else:
-            for error in list(form.errors.values()):
-                messages.error(request, error)
+        
     form = SetDisplayNameForm(instance=request.user)
     return render(request, 'user/displayname_or_password_update.html', {'form': form, 'subheading': 'Display Name'})
 
@@ -190,9 +185,6 @@ def passwordResetConfirm(request, uidb64, token):
                 form.save()
                 messages.success(request, "Your password has been set. You may log in now.")
                 return redirect('user-login')
-            else:
-                for error in list(form.errors.values()):
-                    messages.error(request, error)
 
         form = SetPasswordForm(user)
         return render(request, 'user/password_reset_confirm.html', {'form': form})
@@ -259,8 +251,7 @@ def userDeleteConfirm(request, uidb64, token):
                     messages.success(request, "Your account has been deleted.")
                     return redirect('poll-home')
                 messages.error(request, "Password incorrect")
-            for error in list(form.errors.values()):
-                messages.error(request, error)
+            
         else:
             form = UserDeleteConfirmForm()
         return render(

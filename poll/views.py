@@ -288,7 +288,6 @@ def getExisting_pollOptionUserResponses(request, pollOptions):
     return pollOptionUserResponses
 
 
-
 def vote(request, pk):
     pollOptions = PollOption.objects.filter(poll_id = pk)
 
@@ -299,13 +298,14 @@ def vote(request, pk):
     if request.method == 'POST':
         oAndVoteForms = []
 
+
         for index, o in enumerate(pollOptions):
             voteForm = PollVoteForm(request.POST, initial={'poll_option_id' : o}, prefix=str(index))
             oAndVoteForms.append((o, voteForm))
-            metaForm = PollVoteResponderMetaForm(request.POST, initial={
-                'responder_user_id': request.user.id if request.user.is_authenticated else None, 
-                'responder_nonuser_id': request.session["nonUserId"] if not request.user.is_authenticated else None, 
-            })
+        metaForm = PollVoteResponderMetaForm(request.POST, initial={
+            'responder_user_id': request.user.id if request.user.is_authenticated else None, 
+            'responder_nonuser_id': request.session["nonUserId"] if not request.user.is_authenticated else None, 
+        })
 
         # validate form and save to PollOptionResponses table (update entries if existing else create)
         allVoteFormsValid = True
@@ -315,17 +315,11 @@ def vote(request, pk):
 
         if allVoteFormsValid and metaForm.is_valid():
             
+            # if the same user has voted previously, delete them (since we want to update rather than create double the votes)
             pollOptionUserResponses = getExisting_pollOptionUserResponses(request, pollOptions)
-            # # # # # # # # # # # # # # # # # # # # # # # # # # #
-            # pollOptionUserResponses.delete()  # UNCOMMENT LATER
-            # # # # # # # # # # # # # # # # # # # # # # # # # # #
+            pollOptionUserResponses.delete()
 
-            print("*********************")
-            if not 'response' in voteForm:
-                print(f"response not received!")
-            else:
-                print(f"response received as: {voteForm['response'].value()}")
-
+            # save the new votes in database
             for _, voteForm in oAndVoteForms:
                 vote = PollOptionResponse(    
                     poll_option_id = PollOption.objects.get(pk = voteForm["poll_option_id"].value()),
@@ -335,15 +329,7 @@ def vote(request, pk):
                     response = voteForm["response"].value(),
                 )
                 vote.save()
-
-
             return redirect("poll-detail", pk=pk)
-
-        for _, voteForm in oAndVoteForms:
-            for error in list(voteForm.errors.values()):
-                messages.error(request, error)
-        for error in list(metaForm.errors.values()):
-            messages.error(request, error)
 
     else:  # GET request
         oAndVoteForms = []
@@ -351,12 +337,12 @@ def vote(request, pk):
         for index, o in enumerate(pollOptions):
             voteForm = PollVoteForm(initial={'poll_option_id' : o}, prefix=str(index))
             oAndVoteForms.append((o, voteForm))
-            metaForm = PollVoteResponderMetaForm(initial={
-                'responder_user_id': request.user.id if request.user.is_authenticated else None, 
-                'responder_nonuser_id': request.session["nonUserId"] if not request.user.is_authenticated else None, 
-            })
+        metaForm = PollVoteResponderMetaForm(initial={
+            'responder_user_id': request.user.id if request.user.is_authenticated else None, 
+            'responder_nonuser_id': request.session["nonUserId"] if not request.user.is_authenticated else None, 
+        })
         if not request.user.is_authenticated:
-            messages.add_message(request, messages.WARNING, "You are voting as a guest since you have not logged in. Hence, you cannot modify these votes if you use another web session.")
+            messages.add_message(request, messages.WARNING, "Warning: You are voting as a guest since you have not logged in. Hence, you cannot modify these votes if you use another web session.")
 
     return render(
         request, 'poll/poll_vote.html',

@@ -52,6 +52,7 @@ class PollUpdatePasswordForm(ModelForm):
             if poll_password != poll_password_confirm:
                 raise ValidationError('New poll passwords do not match')
 
+
 class PollVoteForm(Form):
     
     poll_option_id = forms.ModelChoiceField(queryset = PollOption.objects.all(), disabled=True, widget = forms.HiddenInput())

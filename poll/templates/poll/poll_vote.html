@@ -11,7 +11,7 @@
                     Poll Vote
                 </legend>
 
-                <div class=" px-5 py-1 outline outline-red-600">
+                <div class="">
                     {% for o, voteForm in oAndVoteForms %}
 
                         {% comment %} <div class="my-5">
@@ -27,9 +27,11 @@
                             </div>
                         </div> {% endcomment %}
                         
+                        <div class="outline outline-2 outline-slate-400 p-2 rounded-lg mb-5">
                         {{ o.event_start_time }}
                         {{ o.event_end_time }}
                         {{ voteForm|crispy }}  <!-- For debugging -->
+                        </div>
 
                     {% endfor %}
                 </div>
