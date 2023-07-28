@@ -276,8 +276,6 @@ def getExisting_pollOptionUserResponses(request, pollOptions):
         If this user is authenticated -> ID by user.id
     """
     if not request.user.is_authenticated:
-        if "nonUserId" not in request.session:
-            request.session["nonUserId"] = str(uuid.uuid4())
         pollOptionUserResponses = PollOptionResponse.objects.filter(
             poll_option_id__in = pollOptions, 
             responder_nonuser_id = request.session["nonUserId"]
@@ -290,8 +288,13 @@ def getExisting_pollOptionUserResponses(request, pollOptions):
     return pollOptionUserResponses
 
 
+
 def vote(request, pk):
     pollOptions = PollOption.objects.filter(poll_id = pk)
+
+    if not request.user.is_authenticated:
+        if "nonUserId" not in request.session:
+            request.session["nonUserId"] = str(uuid.uuid4())
     
     if request.method == 'POST':
         oAndVoteForms = []
@@ -318,9 +321,8 @@ def vote(request, pk):
             # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
             print("***************************")
-            metaForm["responder_user_id"]
-            metaForm["responder_user_id"].value()
-            print(User.objects.filter(pk=metaForm["responder_user_id"].value()).first() == None)
+            print(voteForm["response"])
+            print(voteForm["response"].value())
             
             print("***************************")
 
@@ -330,7 +332,7 @@ def vote(request, pk):
                     responder_user_id = User.objects.filter(pk=metaForm["responder_user_id"].value()).first(),  # get or None
                     responder_nonuser_id = metaForm["responder_nonuser_id"].value(),
                     responder_name = metaForm["main_responder_name"].value(),
-                    response = voteForm["response"],
+                    response = voteForm["response"].value(),
                 )
                 vote.save()
             return redirect("poll-detail", pk=pk)
