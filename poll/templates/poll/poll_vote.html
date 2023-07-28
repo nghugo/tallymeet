@@ -28,8 +28,8 @@
                         </div> {% endcomment %}
                         
                         <div class="outline outline-2 outline-slate-400 p-2 rounded-lg mb-5">
-                        {{ o.event_start_time }}
-                        {{ o.event_end_time }}
+                        <p> Event start time: {{ o.event_start_time }} </p>
+                        <p> Event end time: {{ o.event_end_time }} </p>
                         {{ voteForm|crispy }}  <!-- For debugging -->
                         </div>
 

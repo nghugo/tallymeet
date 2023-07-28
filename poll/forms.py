@@ -54,16 +54,13 @@ class PollUpdatePasswordForm(ModelForm):
 
 
 class PollVoteForm(Form):
-    
     poll_option_id = forms.ModelChoiceField(queryset = PollOption.objects.all(), disabled=True, widget = forms.HiddenInput())
-
-    # response = forms.ChoiceField(choices = PollOptionResponse.RESPONSE_CHOICES, required=True)
     response = forms.ChoiceField(widget=forms.RadioSelect(attrs={"required": True}), choices = PollOptionResponse.RESPONSE_CHOICES)
 
 
 class PollVoteResponderMetaForm(Form):
     responder_user_id = forms.CharField(disabled=True, required=False, widget = forms.HiddenInput()) # disable to prevent modification
     responder_nonuser_id = forms.CharField(disabled=True, required=False, widget = forms.HiddenInput()) # disable to prevent modification
-    
-    main_responder_name = forms.CharField(required=True, label="Responder Name")  # allow user to modify
+
+    responder_name = forms.CharField(required=True, label="Responder Name")  # allow user to modify
     captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")

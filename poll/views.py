@@ -325,7 +325,7 @@ def vote(request, pk):
                     poll_option_id = PollOption.objects.get(pk = voteForm["poll_option_id"].value()),
                     responder_user_id = User.objects.filter(pk=metaForm["responder_user_id"].value()).first(),  # get or None
                     responder_nonuser_id = metaForm["responder_nonuser_id"].value(),
-                    responder_name = metaForm["main_responder_name"].value(),
+                    responder_name = metaForm["responder_name"].value(),
                     response = voteForm["response"].value(),
                 )
                 vote.save()
@@ -340,10 +340,13 @@ def vote(request, pk):
         metaForm = PollVoteResponderMetaForm(initial={
             'responder_user_id': request.user.id if request.user.is_authenticated else None, 
             'responder_nonuser_id': request.session["nonUserId"] if not request.user.is_authenticated else None, 
+            
+            'responder_name': request.user.display_name if request.user.is_authenticated else None,
         })
         if not request.user.is_authenticated:
             messages.add_message(request, messages.WARNING, "Warning: You are voting as a guest since you have not logged in. Hence, you cannot modify these votes if you use another web session.")
-
+        else:
+            messages.add_message(request, messages.INFO, f"You are voting as {request.user.display_name}, though you can modify the name below.")
     return render(
         request, 'poll/poll_vote.html',
         {'oAndVoteForms': oAndVoteForms,
