@@ -10,13 +10,13 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponseForbidden
 
 from .forms import (PollPasswordForm, PollCreateForm, PollUpdatePasswordForm, 
-                    PollVoteExtraForm, PollVoteForm)
+                    PollVoteResponderMetaForm, PollVoteForm)
 from .models import Poll
 from .views_helper import getSavedPollPassword, getRankedResponses, addDenseRank
 from .views_helper import get_item  # not explicitly called, but required for dictionary query inside template of DetailView 
 
 from polloption.models import PollOption, PollOptionResponse
-
+from user.models import User
 
 
 def home(request):
@@ -265,58 +265,100 @@ class PollDeleteView(SuccessMessageMixin, DeleteView):
             return HttpResponseForbidden()
         return super().post(request, *args, **kwargs)
 
-def vote(request, pk):
 
-    # put this into function later
-    if request.user.is_authenticated:
-        UserID = request.user.id
-    else:
+
+# filter out existing pollOptionUserResponses in database
+def getExisting_pollOptionUserResponses(request, pollOptions):
+    """
+        Given poll options and the user making the request (via the request object), 
+        return the poll option responses that belong to the user making the request
+        If this user is anonymous -> ID by uuid4
+        If this user is authenticated -> ID by user.id
+    """
+    if not request.user.is_authenticated:
         if "nonUserId" not in request.session:
-            request.session["nonUserId"] = uuid.uuid4()
-            messages.add_message(request, messages.WARNING, "You are voting as guest. After closing this browser window, you can view but can no longer edit your votes. To make sure you can edit your votes whenever, sign up for an account.")
-        UserID = request.session["nonUserId"]
+            request.session["nonUserId"] = str(uuid.uuid4())
+        pollOptionUserResponses = PollOptionResponse.objects.filter(
+            poll_option_id__in = pollOptions, 
+            responder_nonuser_id = request.session["nonUserId"]
+        )
+    else:
+        pollOptionUserResponses = PollOptionResponse.objects.filter(
+            poll_option_id__in = pollOptions, 
+            responder_user_id = request.user.id
+        )
+    return pollOptionUserResponses
 
+
+def vote(request, pk):
     pollOptions = PollOption.objects.filter(poll_id = pk)
-
-    pollOptionUserResponses = PollOptionResponse.objects.filter(poll_option_id__in = pollOptions, responder_id = UserID)
-
+    
     if request.method == 'POST':
         oAndVoteForms = []
+
         for o in pollOptions:
-            voteForm = PollVoteForm(request.POST)
-            request.user.id
-            # {'poll_option_id' : o}
-            oAndVoteForms.append(o, voteForm)
-        extraForm = PollVoteExtraForm(request.POST)
-        
+            voteForm = PollVoteForm(request.POST, initial={'poll_option_id' : o})
+            oAndVoteForms.append((o, voteForm))
+            metaForm = PollVoteResponderMetaForm(request.POST, initial={
+                'responder_user_id': request.user.id if request.user.is_authenticated else None, 
+                'responder_nonuser_id': request.session["nonUserId"] if not request.user.is_authenticated else None, 
+            })
+        if not request.user.is_authenticated:
+            messages.add_message(request, messages.WARNING, "You are voting as a guest since you have not logged in. After voting, once you close and re-open your browser window, you can no longer modify your votes (since you will be recognized as a different guest).")
+
+        # validate form and save to PollOptionResponses table (update entries if existing else create)
         allVoteFormsValid = True
         for _, voteForm in oAndVoteForms:
             allVoteFormsValid = allVoteFormsValid and voteForm.is_valid
+        if allVoteFormsValid and metaForm.is_valid():
+            
+            pollOptionUserResponses = getExisting_pollOptionUserResponses(request, pollOptions)
+            # # # # # # # # # # # # # # # # # # # # # # # # # # #
+            # pollOptionUserResponses.delete()  # UNCOMMENT LATER
+            # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-        if allVoteFormsValid and extraForm.is_valid():
-            pass
-            # loop through all forms to save them to model
-            # DO SOMETHING with poll_id, poll_responder (name), poll_id, etc before saving
+            print("***************************")
+            metaForm["responder_user_id"]
+            metaForm["responder_user_id"].value()
+            print(User.objects.filter(pk=metaForm["responder_user_id"].value()).first() == None)
+            
+            print("***************************")
+
+            for _, voteForm in oAndVoteForms:
+                vote = PollOptionResponse(    
+                    poll_option_id = PollOption.objects.get(pk = voteForm["poll_option_id"].value()),
+                    responder_user_id = User.objects.filter(pk=metaForm["responder_user_id"].value()).first(),  # get or None
+                    responder_nonuser_id = metaForm["responder_nonuser_id"].value(),
+                    responder_name = metaForm["main_responder_name"].value(),
+                    response = voteForm["response"],
+                )
+                vote.save()
+            return redirect("poll-detail", pk=pk)
 
         for _, voteForm in oAndVoteForms:
             for error in list(voteForm.errors.values()):
                 messages.error(request, error)
-        for error in list(extraForm.errors.values()):
+        for error in list(metaForm.errors.values()):
             messages.error(request, error)
 
     else:  # GET request
-        # DEBUG
-
         oAndVoteForms = []
-        for o in pollOptions:
-            VoteForm = PollVoteForm(initial={'responder_id': request.user.id, 'poll_option_id' : o})
-            # , initial={, 'responder_id': request.user.id}
-            oAndVoteForms.append((o, VoteForm))
-        extraForm = PollVoteExtraForm()
 
-    # DEBUG
-    # return render(request, 'poll/home.html')
-    return render(request, 'poll/poll_vote.html', {'oAndVoteForms': oAndVoteForms, 'extraForm': extraForm, 'pk': pk})
-    
-    # return render(request, 'poll/poll_vote.html', {'extraForm': extraForm, 'pk': pk, 'testform': testform})
+        for o in pollOptions:
+            voteForm = PollVoteForm(initial={'poll_option_id' : o})
+            oAndVoteForms.append((o, voteForm))
+            metaForm = PollVoteResponderMetaForm(initial={
+                'responder_user_id': request.user.id if request.user.is_authenticated else None, 
+                'responder_nonuser_id': request.session["nonUserId"] if not request.user.is_authenticated else None, 
+            })
+        if not request.user.is_authenticated:
+                messages.add_message(request, messages.WARNING, "You are voting as a guest since you have not logged in. After voting, once you close and re-open your browser window, you can no longer modify your votes (since you will be recognized as a different guest).")
+
+    return render(
+        request, 'poll/poll_vote.html',
+        {'oAndVoteForms': oAndVoteForms,
+         'metaForm': metaForm, 
+         'pk': pk
+        }
+    )
      

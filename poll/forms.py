@@ -55,11 +55,8 @@ class PollUpdatePasswordForm(ModelForm):
 class PollVoteForm(Form):
     
     # poll_option_id = forms.ModelChoiceField(queryset = PollOption.objects.all(), disabled=True, widget = forms.HiddenInput())  # disable and initialize as poll options of the poll later
-    responder_id = forms.CharField(disabled=True, widget = forms.HiddenInput()) # disable to prevent modification
+    poll_option_id = forms.ModelChoiceField(queryset = PollOption.objects.all(), disabled=True)
 
-    responder_name = forms.CharField(required=False, widget = forms.HiddenInput())  # fill in using main_responder_name during form submission
-
-    # responder_name = forms.CharField(required=False, widget = forms.HiddenInput())  # fill in using main_responder_name during form submission
     response = forms.ChoiceField(widget=forms.RadioSelect, choices = PollOptionResponse.RESPONSE_CHOICES)
 
     # class Meta:
@@ -68,6 +65,11 @@ class PollVoteForm(Form):
     #     # to prevent tampering, also need to check for permission (against poll password of poll_id)        
     #     fields = "__all__"
 
-class PollVoteExtraForm(Form):
-    main_responder_name = forms.CharField(required=True)  # allow user to modify
+class PollVoteResponderMetaForm(Form):
+    # responder_user_id = forms.CharField(disabled=True, required=False, widget = forms.HiddenInput()) # disable to prevent modification
+    # responder_nonuser_id = forms.CharField(disabled=True, required=False, widget = forms.HiddenInput()) # disable to prevent modification
+    responder_user_id = forms.CharField(disabled=True, required=False)
+    responder_nonuser_id = forms.CharField(disabled=True, required=False)
+    
+    main_responder_name = forms.CharField(required=True, label="Responder Name")  # allow user to modify
     captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")

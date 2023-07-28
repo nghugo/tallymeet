@@ -20,10 +20,10 @@ class Poll(models.Model):
 
 
 # class PollResponderXref(models.Model):
-#     responder_id = models.ForeignKey(User, on_delete=models.CASCADE)
+#     responder_user_id = models.ForeignKey(User, on_delete=models.CASCADE)
 #     poll_id = models.ForeignKey(PollOption, on_delete=models.CASCADE)
     
 #     def __str__(self):
-#         return ''.join([str(self.responder_id), str(self.poll_id)])
+#         return ''.join([str(self.responder_user_id), str(self.poll_id)])
 
 
