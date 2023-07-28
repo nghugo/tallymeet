@@ -15,10 +15,18 @@
                     {% for o, voteForm in oAndVoteForms %}
                         {{ o.event_start_time }}
                         {{ o.event_end_time }}
-                        {% for field in voteForm %}
+                        <div class="flex">
+                        {% for choice in voteForm.response %}
+                            <div class="mr-5">
+                                <span> {{ choice.tag }} </span>
+                                <span> {{ choice.choice_label }} </span>
+                            </div>
+                        {% endfor %}
+                        </div>
+                        {% comment %} {% for field in voteForm %}
                             {{ field.label }}    
                             {{ field }}
-                        {% endfor %}
+                        {% endfor %} {% endcomment %}
                         {% comment %} {{ voteForm|crispy }}  <!-- loop over form fields later to CSS style --> {% endcomment %}
                         
                         {% comment %} {{ voteForm}}  <!-- loop over form fields later to CSS style --> {% endcomment %}
