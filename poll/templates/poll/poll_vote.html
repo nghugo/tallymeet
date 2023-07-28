@@ -12,7 +12,11 @@
                 </legend>
 
                 <div class="p-6 outline outline-red-600">
-                    {{ formset|crispy }}  <!-- loop over form fields later to CSS style -->
+                    {% for voteForm in voteForms %}
+                        {% comment %} {{ voteForm|crispy }}  <!-- loop over form fields later to CSS style --> {% endcomment %}
+                        {{ voteForm}}  <!-- loop over form fields later to CSS style -->
+                        <!-- also disable crispy for now -->
+                    {% endfor %}
                 </div>
                 
                 {% comment %} <div class="p-6 outline outline-red-600">

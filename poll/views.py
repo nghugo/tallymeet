@@ -1,3 +1,5 @@
+import uuid
+
 from django.shortcuts import render, redirect
 from django.views.generic import DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.hashers import make_password
@@ -8,12 +10,13 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponseForbidden
 
 from .forms import (PollPasswordForm, PollCreateForm, PollUpdatePasswordForm, 
-                    PollVoteFormSet, PollVoteExtraForm, PollVoteForm)
+                    PollVoteExtraForm, PollVoteForm)
 from .models import Poll
 from .views_helper import getSavedPollPassword, getRankedResponses, addDenseRank
 from .views_helper import get_item  # not explicitly called, but required for dictionary query inside template of DetailView 
 
 from polloption.models import PollOption, PollOptionResponse
+
 
 
 def home(request):
@@ -262,51 +265,70 @@ class PollDeleteView(SuccessMessageMixin, DeleteView):
             return HttpResponseForbidden()
         return super().post(request, *args, **kwargs)
 
-
 def vote(request, pk):
-    
-    if request.method == 'POST':
 
-        # # DEBUG
-        # testform = PollVoteForm(request.POST, initial={'poll_id' : pk, 'responder_id': request.user.id})
-        
-        # formset = PollVoteFormSet(request.POST, initial={'poll_id' : pk, 'responder_id': request.user.id})
-        formset = PollVoteFormSet(request.POST)
+    # put this into function later
+    if request.user.is_authenticated:
+        UserID = request.user.id
+    else:
+        if "nonUserId" not in request.session:
+            request.session["nonUserId"] = uuid.uuid4()
+            messages.add_message(request, messages.WARNING, "You are voting as guest. After closing this browser window, you can view but can no longer edit your votes. To make sure you can edit your votes whenever, sign up for an account.")
+        UserID = request.session["nonUserId"]
+
+    pollOptions = PollOption.objects.filter(poll_id = pk)
+
+    print("*_*_*_*_*_**_*_*_*_*_*_*_")
+    print(pollOptions)
+    for o in pollOptions:
+        print(o)
+    print("*_*_*_*_*_**_*_*_*_*_*_*_")
+
+    pollOptionUserResponses = PollOptionResponse.objects.filter(poll_option_id__in = pollOptions, responder_id = UserID)
+    
+
+    if request.method == 'POST':
+        voteForms = []
+        for o in pollOptions:
+            voteForm = PollVoteForm(request.POST)
+            # , initial={'poll_id' : pk, 'responder_id': request.user.id}
+            voteForms.append(voteForm)
         extraForm = PollVoteExtraForm(request.POST)
         
-        if formset.is_valid() and extraForm.is_valid():
-            formset.save()
-            # DO SOMETHING with poll_id
-        
-        # # DEBUG
-        # if testform.is_valid() and extraForm.is_valid():
-        #     testform.save()    
-        #     return redirect("poll-detail", pk=pk)
+        allVoteFormsValid = True
+        for voteForm in voteForms:
+            allVoteFormsValid = allVoteFormsValid and voteForm.is_valid
 
-        # for error in list(testform.errors.values()):
-        #     messages.error(request, error)
+        if allVoteFormsValid and extraForm.is_valid():
+            pass
+            # loop through all forms to save them to model
+            # DO SOMETHING with poll_id, poll_responder (name), poll_id, etc before saving
 
-        for error in list(formset.errors.values()):
-            messages.error(request, error)
+        for voteForm in voteForms:
+            for error in list(voteForm.errors.values()):
+                messages.error(request, error)
         for error in list(extraForm.errors.values()):
             messages.error(request, error)
 
     else:  # GET request
         # DEBUG
-        testform = PollVoteForm()
 
-        # formset = PollVoteFormSet(initial={'poll_id' : pk, 'responder_id': request.user.id})
-        formset = PollVoteFormSet()
-
+        voteForms = []
+        for o in pollOptions:
+            voteForm = PollVoteForm()
+            # , initial={'poll_id' : pk, 'responder_id': request.user.id}
+            voteForms.append(voteForm)
+            print(voteForm)
         extraForm = PollVoteExtraForm()
-        
-        # print("*******************")
-        # # print(formset)
-        # # print(extraForm)
-        # print(testform)
     
+    print("******************")
+    # for voteForm in voteForms:
+    #     print(voteForm)
+    print("******************")
+
     # DEBUG
-    return render(request, 'poll/poll_vote.html', {'formset': formset, 'extraForm': extraForm, 'pk': pk})
+    return render(request, 'poll/poll_home.html')
+    return render(request, 'poll/poll_vote.html', {'voteForms': voteForms, 'extraForm': extraForm, 'pk': pk})
     
     # return render(request, 'poll/poll_vote.html', {'extraForm': extraForm, 'pk': pk, 'testform': testform})
      
