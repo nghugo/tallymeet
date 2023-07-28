@@ -281,15 +281,16 @@ def vote(request, pk):
     pollOptionUserResponses = PollOptionResponse.objects.filter(poll_option_id__in = pollOptions, responder_id = UserID)
 
     if request.method == 'POST':
-        voteForms = []
+        oAndVoteForms = []
         for o in pollOptions:
             voteForm = PollVoteForm(request.POST)
-            # , initial={'poll_id' : pk, 'responder_id': request.user.id}
-            voteForms.append(voteForm)
+            request.user.id
+            # {'poll_option_id' : o}
+            oAndVoteForms.append(o, voteForm)
         extraForm = PollVoteExtraForm(request.POST)
         
         allVoteFormsValid = True
-        for voteForm in voteForms:
+        for _, voteForm in oAndVoteForms:
             allVoteFormsValid = allVoteFormsValid and voteForm.is_valid
 
         if allVoteFormsValid and extraForm.is_valid():
@@ -297,7 +298,7 @@ def vote(request, pk):
             # loop through all forms to save them to model
             # DO SOMETHING with poll_id, poll_responder (name), poll_id, etc before saving
 
-        for voteForm in voteForms:
+        for _, voteForm in oAndVoteForms:
             for error in list(voteForm.errors.values()):
                 messages.error(request, error)
         for error in list(extraForm.errors.values()):
@@ -306,18 +307,16 @@ def vote(request, pk):
     else:  # GET request
         # DEBUG
 
-        voteForms = []
+        oAndVoteForms = []
         for o in pollOptions:
-            voteForm = PollVoteForm()
-            # , initial={'poll_id' : pk, 'responder_id': request.user.id}
-            voteForms.append(voteForm)
-            print(voteForm.is_bound)
-            # print(voteForm)
+            VoteForm = PollVoteForm(initial={'responder_id': request.user.id, 'poll_option_id' : o})
+            # , initial={, 'responder_id': request.user.id}
+            oAndVoteForms.append((o, VoteForm))
         extraForm = PollVoteExtraForm()
 
     # DEBUG
     # return render(request, 'poll/home.html')
-    return render(request, 'poll/poll_vote.html', {'voteForms': voteForms, 'extraForm': extraForm, 'pk': pk})
+    return render(request, 'poll/poll_vote.html', {'oAndVoteForms': oAndVoteForms, 'extraForm': extraForm, 'pk': pk})
     
     # return render(request, 'poll/poll_vote.html', {'extraForm': extraForm, 'pk': pk, 'testform': testform})
      

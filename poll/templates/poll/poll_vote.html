@@ -12,8 +12,15 @@
                 </legend>
 
                 <div class="p-6 outline outline-red-600">
-                    {% for voteForm in voteForms %}
-                        {{ voteForm|crispy }}  <!-- loop over form fields later to CSS style -->
+                    {% for o, voteForm in oAndVoteForms %}
+                        {{ o.event_start_time }}
+                        {{ o.event_end_time }}
+                        {% for field in voteForm %}
+                            {{ field.label }}    
+                            {{ field }}
+                        {% endfor %}
+                        {% comment %} {{ voteForm|crispy }}  <!-- loop over form fields later to CSS style --> {% endcomment %}
+                        
                         {% comment %} {{ voteForm}}  <!-- loop over form fields later to CSS style --> {% endcomment %}
                         <!-- also disable crispy for now -->
                     {% endfor %}
