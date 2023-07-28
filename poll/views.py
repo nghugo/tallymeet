@@ -299,15 +299,13 @@ def vote(request, pk):
     if request.method == 'POST':
         oAndVoteForms = []
 
-        for o in pollOptions:
-            voteForm = PollVoteForm(request.POST, initial={'poll_option_id' : o})
+        for index, o in enumerate(pollOptions):
+            voteForm = PollVoteForm(request.POST, initial={'poll_option_id' : o}, prefix=str(index))
             oAndVoteForms.append((o, voteForm))
             metaForm = PollVoteResponderMetaForm(request.POST, initial={
                 'responder_user_id': request.user.id if request.user.is_authenticated else None, 
                 'responder_nonuser_id': request.session["nonUserId"] if not request.user.is_authenticated else None, 
             })
-        if not request.user.is_authenticated:
-            messages.add_message(request, messages.WARNING, "You are voting as a guest since you have not logged in. After voting, once you close and re-open your browser window, you can no longer modify your votes (since you will be recognized as a different guest).")
 
         # validate form and save to PollOptionResponses table (update entries if existing else create)
         allVoteFormsValid = True
@@ -346,15 +344,15 @@ def vote(request, pk):
     else:  # GET request
         oAndVoteForms = []
 
-        for o in pollOptions:
-            voteForm = PollVoteForm(initial={'poll_option_id' : o})
+        for index, o in enumerate(pollOptions):
+            voteForm = PollVoteForm(initial={'poll_option_id' : o}, prefix=str(index))
             oAndVoteForms.append((o, voteForm))
             metaForm = PollVoteResponderMetaForm(initial={
                 'responder_user_id': request.user.id if request.user.is_authenticated else None, 
                 'responder_nonuser_id': request.session["nonUserId"] if not request.user.is_authenticated else None, 
             })
         if not request.user.is_authenticated:
-                messages.add_message(request, messages.WARNING, "You are voting as a guest since you have not logged in. After voting, once you close and re-open your browser window, you can no longer modify your votes (since you will be recognized as a different guest).")
+            messages.add_message(request, messages.WARNING, "You are voting as a guest since you have not logged in. After voting, once you close and re-open your browser window, you can no longer modify your votes (since you will be recognized as a different guest).")
 
     return render(
         request, 'poll/poll_vote.html',

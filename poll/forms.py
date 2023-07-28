@@ -55,9 +55,10 @@ class PollUpdatePasswordForm(ModelForm):
 class PollVoteForm(Form):
     
     # poll_option_id = forms.ModelChoiceField(queryset = PollOption.objects.all(), disabled=True, widget = forms.HiddenInput())  # disable and initialize as poll options of the poll later
-    poll_option_id = forms.ModelChoiceField(queryset = PollOption.objects.all(), disabled=True)
+    poll_option_id = forms.ModelChoiceField(queryset = PollOption.objects.all(), disabled=True)  # disable and initialize as poll options of the poll later
 
-    response = forms.ChoiceField(widget=forms.RadioSelect, choices = PollOptionResponse.RESPONSE_CHOICES)
+    # response = forms.ChoiceField(choices = PollOptionResponse.RESPONSE_CHOICES, required=True)
+    response = forms.ChoiceField(widget=forms.RadioSelect(attrs={"required": True}), choices = PollOptionResponse.RESPONSE_CHOICES)
 
     # class Meta:
     #     model = PollOptionResponse
