@@ -310,7 +310,9 @@ def vote(request, pk):
         # validate form and save to PollOptionResponses table (update entries if existing else create)
         allVoteFormsValid = True
         for _, voteForm in oAndVoteForms:
-            allVoteFormsValid = allVoteFormsValid and voteForm.is_valid
+            allVoteFormsValid = allVoteFormsValid and voteForm.is_valid()
+        
+
         if allVoteFormsValid and metaForm.is_valid():
             
             pollOptionUserResponses = getExisting_pollOptionUserResponses(request, pollOptions)
@@ -318,11 +320,11 @@ def vote(request, pk):
             # pollOptionUserResponses.delete()  # UNCOMMENT LATER
             # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-            print("***************************")
-            print(voteForm["response"])
-            print(voteForm["response"].value())
-            
-            print("***************************")
+            print("*********************")
+            if not 'response' in voteForm:
+                print(f"response not received!")
+            else:
+                print(f"response received as: {voteForm['response'].value()}")
 
             for _, voteForm in oAndVoteForms:
                 vote = PollOptionResponse(    
@@ -333,6 +335,8 @@ def vote(request, pk):
                     response = voteForm["response"].value(),
                 )
                 vote.save()
+
+
             return redirect("poll-detail", pk=pk)
 
         for _, voteForm in oAndVoteForms:
@@ -352,7 +356,7 @@ def vote(request, pk):
                 'responder_nonuser_id': request.session["nonUserId"] if not request.user.is_authenticated else None, 
             })
         if not request.user.is_authenticated:
-            messages.add_message(request, messages.WARNING, "You are voting as a guest since you have not logged in. After voting, once you close and re-open your browser window, you can no longer modify your votes (since you will be recognized as a different guest).")
+            messages.add_message(request, messages.WARNING, "You are voting as a guest since you have not logged in. Hence, you cannot modify these votes if you use another web session.")
 
     return render(
         request, 'poll/poll_vote.html',
