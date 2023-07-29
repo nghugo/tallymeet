@@ -25,7 +25,7 @@ class PollOptionResponse(models.Model):
 
     poll_option_id = models.ForeignKey(PollOption, on_delete=models.CASCADE)
     responder_user_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    responder_nonuser_id = models.CharField(max_length=255, null=True, blank=True)
+    responder_nonuser_id = models.UUIDField(null=True, blank=True)
     responder_name = models.CharField(max_length=255)
     response = models.CharField(max_length=1, choices=RESPONSE_CHOICES)
 
