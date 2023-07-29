@@ -267,11 +267,21 @@ class PollDeleteView(SuccessMessageMixin, DeleteView):
         return super().post(request, *args, **kwargs)
 
 
-
-
-
-
 def vote(request, pk):
+    pollObject = Poll.objects.get(pk=pk)
+
+    # password verification for both GET and POST
+    poll_password_hashed = pollObject.poll_password
+    entered_password = getSavedPollPassword(request.session, str(pk))
+    
+    if pollObject.poll_password:
+        if not entered_password:
+            return redirect(reverse('poll-verify-password')  + "?next=" + reverse('poll-vote', args=[pk]))
+        elif not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed):
+            messages.add_message(request, messages.ERROR, "Incorrect password")
+            return redirect(reverse('poll-verify-password')  + "?next=" + reverse('poll-vote', args=[pk]))
+
+    
     pollOptions = PollOption.objects.filter(poll_id = pk)
 
     # if no poll options found, notifiy user that there is nothing to vote

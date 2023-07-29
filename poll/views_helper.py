@@ -5,6 +5,10 @@ from polloption.models import PollOption, PollOptionResponse
 def getSavedPollPassword(requestSession, id):
     """ Objective: return the latest correct poll password the user provided for a poll id, and also save it under poll_id key of the entered_password_dict in the session object
         -------------------------------------------------------------------
+        Parameters:
+        1. requestSession (request.session object)
+        2. id (str poll id) (not int)
+        -------------------------------------------------------------------
         Priorities:
         1. returns self.request.session['pollPasswordAtPollCreation'] if exists
             (most recent password is set after creating poll)
