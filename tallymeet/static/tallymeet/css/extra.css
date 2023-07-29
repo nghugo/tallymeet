@@ -1,3 +1,5 @@
+/* flash messages */
+
 ul.messages li {
   padding-left: 1rem/* 16px */;
   padding-right: 1rem/* 16px */;
@@ -35,4 +37,16 @@ ul.messages li.error {
   border-color: rgb(254, 143, 143);
   background-color: rgb(254 226 226);
   color: rgb(220 38 38);
+}
+
+/* voting radio buttons */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  div.radio input[type="radio"] {
+    @apply hidden absolute peer;
+  }
 }

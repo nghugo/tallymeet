@@ -17,9 +17,12 @@
     <!-- <link rel="icon" type="image/x-icon" href="/images/schedule64.ico"> -->  <!-- for debugging with VSCode live server -->
     <link rel="icon" type="image/png" href="{% static 'tallymeet/images/schedule.png' %}" />  <!-- for Django -->
     
-    <!-- for production: use tailwind output css rather than tailwind cdn -->
-    <!-- <link rel="stylesheet" type="text/css" href="{% static 'tallymeet/css/output.css' %}" />   -->
+    {% comment %} <!-- for production: use tailwind output css rather than tailwind cdn -->
+    <link rel="stylesheet" type="text/css" href="{% static 'tallymeet/css/output.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'tallymeet/css/extra.css' %}" />
+     {% endcomment %}
+     
+    <!-- tailwind cdn needed to handle dynamic classes -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- alpine js for x-open in hamburger menu -->

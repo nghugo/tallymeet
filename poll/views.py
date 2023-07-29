@@ -274,14 +274,19 @@ class PollDeleteView(SuccessMessageMixin, DeleteView):
 def vote(request, pk):
     pollOptions = PollOption.objects.filter(poll_id = pk)
 
+    # if no poll options found, notifiy user that there is nothing to vote
+    if not pollOptions:
+        return render(request, 
+            template_name = "polloption/polloption_empty_queryset.html", 
+            context = {"pollid": pk},)
+        
+
     if not request.user.is_authenticated:
         if "nonUserId" not in request.session:
             request.session["nonUserId"] = str(uuid.uuid4())
     
     if request.method == 'POST':
         oAndVoteForms = []
-
-
         for index, o in enumerate(pollOptions):
             voteForm = PollVoteForm(request.POST, initial={'poll_option_id' : o}, prefix=str(index))
             oAndVoteForms.append((o, voteForm))
@@ -294,7 +299,6 @@ def vote(request, pk):
         allVoteFormsValid = True
         for _, voteForm in oAndVoteForms:
             allVoteFormsValid = allVoteFormsValid and voteForm.is_valid()
-        
 
         if allVoteFormsValid and metaForm.is_valid():
             
@@ -319,19 +323,6 @@ def vote(request, pk):
 
         pollOptionUserResponses = getExisting_pollOptionUserResponses(request, pollOptions)
         pollOption_To_pollOptionUserResponse = {r.poll_option_id: r.response for r in pollOptionUserResponses}
-        
-
-        # print("***********************")
-        # if pollOptionUserResponses:
-        #     prevName = pollOptionUserResponses[0].responder_name
-        #     print(f"name found: {prevName}")
-        # else:
-        #     print("no name")
-            
-        # for k, v in pollOption_To_pollOptionUserResponse.items():
-        #     print(f"key: {k}")
-        #     print(f"val: {v}")
-        # print("***********************")
 
         for index, o in enumerate(pollOptions):
             voteForm = PollVoteForm(
@@ -342,6 +333,7 @@ def vote(request, pk):
                 prefix = str(index)
             )
             oAndVoteForms.append((o, voteForm))
+
         metaForm = PollVoteResponderMetaForm(initial = {
             'responder_user_id': request.user.id if request.user.is_authenticated else None, 
             'responder_nonuser_id': request.session["nonUserId"] if not request.user.is_authenticated else None, 

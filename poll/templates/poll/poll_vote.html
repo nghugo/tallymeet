@@ -40,6 +40,37 @@
                                 </div>
                             
                             </div>
+                            
+                            <div class="mx-auto flex justify-around mt-32">
+                                <div class="radio-group inline-flex flex-row flex-initial justify-center rounded-lg">
+                                    <div class="radio" class="relative">
+                                        {% comment %} <input type="radio" id="huey" name="drone" value="huey" checked class="hidden absolute peer"> {% endcomment %}
+                                        {{ voteForm.response.0.tag }}
+                                        <label for="huey" class="block text-center px-4 py-3 bg-white border border-grey border-solid w-32 h-32 hover:cursor-pointer peer-checked:border-border-green-500 peer-checked:bg-teal-100">
+                                            <div class="text-3xl mb-2">⏱</div>
+                                          <div class="font-semibold"><strong>{{ voteForm.response.0.choice_label }}</strong></div>
+                                        </label>
+                                    </div>
+                                    <div class="radio bg-white border border-grey border-l-0" class="relative">
+                                        {% comment %} <input type="radio" id="dewey" name="drone" value="dewey" class="hidden absolute peer"> {% endcomment %}
+                                        {{ voteForm.response.1.tag }}
+                                        <label for="dewey" class="block text-center px-4 py-3 bg-white border border-grey border-solid w-32 h-32 hover:cursor-pointer peer-checked:border-border-green-500 peer-checked:bg-teal-100">
+                                            <div class="text-3xl mb-2">🚘</div>
+                                          <div class="font-semibold"><strong>{{ voteForm.response.1.choice_label }}</strong></div>
+                                        </label>
+                                    </div>
+                                    <div class="radio bg-white border border-grey border-l-0" class="relative">
+                                        
+                                        {% comment %} <input type="radio" id="louie" name="drone" value="louie" class="hidden absolute peer"> {% endcomment %}
+                                        {{ voteForm.response.2.tag }}
+                                        <label for="louie" class="block text-center px-4 py-3 bg-white border border-grey border-solid w-32 h-32 hover:cursor-pointer peer-checked:border-border-green-500 peer-checked:bg-teal-100">
+                                            <div class="text-3xl mb-2">🤷‍♂️</div>
+                                          <div class="font-semibold"><strong>{{ voteForm.response.2.choice_label }}</strong></div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
                             {% if not voteForm.is_valid %}
                                 {% for key, val in voteForm.errors.items %}
                                     <strong class="text-red-500 text-xs italic">{{ val }}</strong>
