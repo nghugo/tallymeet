@@ -8,16 +8,22 @@
             {% csrf_token %}
             <fieldset>
                 <legend class="mb-6 text-3xl md:text-4xl lg:max-xl:text-3xl font-bold font-heading leading-none text-center md:text-left">
-                    Poll Vote
+                    Cast Your Vote
                 </legend>
 
                 <div class="">
                     {% for o, voteForm in oAndVoteForms %}
 
-                        <div class="outline outline-2 outline-slate-400 p-2 rounded-lg mb-5">
-                            <p> Event start time: {{ o.event_start_time }} </p>
-                            <p> Event end time: {{ o.event_end_time }} </p>
-                            <div class="flex">
+                        <div class="outline outline-2 outline-slate-400 py-2 px-5 rounded-lg mb-5">
+                            <div class="py-2 flex flex-col sm:flex-row bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                <p class=" pb-1 min-w-[100px] font-medium text-gray-900 whitespace-nowrap dark:text-white"> Start </p>
+                                <p> {{ o.event_start_time }} </p>
+                            </div>
+                            <div class="py-2 flex flex-col sm:flex-row bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                <p class=" pb-1 min-w-[100px] font-medium text-gray-900 whitespace-nowrap dark:text-white"> End </p>
+                                <p> {{ o.event_end_time }} </p>
+                            </div>
+                            <div class="flex py-2">
                                 <div class="mr-5">
                                     <span> {{ voteForm.response.0.tag }} </span>
                                     <span> {{ voteForm.response.0.choice_label }} </span>
