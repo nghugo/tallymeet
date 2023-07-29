@@ -62,7 +62,7 @@ def activate(request, uidb64, token):
         user.is_active = True
         user.save()
 
-        messages.success(request, 'Thank you for your email confirmation. You may log in now.')
+        messages.success(request, 'Thank you for your email confirmation. You may now log in and proceed with your original tasks, if any.')
         return redirect('user-login')
     else:
         messages.error(request, 'Activation link is invalid!')
