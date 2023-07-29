@@ -51,18 +51,26 @@ div.radio input[type="radio"] {
 }
 
 div.radio input[type="radio"]:checked + label[select-color="dark-green"] {
-	border-color:#0d9488;
-  background-color:#99f6e4;
+	border-color:#64748b;
+  background-color:#0d9488;
 }
 
 div.radio input[type="radio"]:checked + label[select-color="light-green"] {
-	border-color:#14b8a6;
-  background-color:#ccfbf1;
+	border-color:#64748b;
+  background-color:#14b8a6;
 }
 
 div.radio input[type="radio"]:checked + label[select-color="grey"] {
-	border-color:#94a3b8;
-  background-color:#f1f5f9;
+	border-color:#64748b;
+  background-color:#94a3b8;
+}
+
+div.radio input[type="radio"]:checked + label path {
+	fill: white !important;
+}
+
+div.radio input[type="radio"]:checked + label div {
+	color: white !important;
 }
 
 
