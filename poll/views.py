@@ -282,7 +282,6 @@ def vote(request, pk):
         elif not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed):
             messages.add_message(request, messages.ERROR, "Incorrect password")
             return redirect(reverse('poll-verify-password')  + "?id=" + str(pk) + "&next=" + reverse('poll-vote', args=[pk]))
-
     
     pollOptions = PollOption.objects.filter(poll_id = pk)
 
@@ -340,7 +339,7 @@ def vote(request, pk):
             voteForm = PollVoteForm(
                 initial = {
                     'poll_option_id' : o,
-                    'response': pollOption_To_pollOptionUserResponse[o] if pollOption_To_pollOptionUserResponse else None,  # Prepopulate with previously entered responses
+                    'response': pollOption_To_pollOptionUserResponse[o] if pollOption_To_pollOptionUserResponse and o in pollOption_To_pollOptionUserResponse else None,  # Prepopulate with previously entered responses
                 }, 
                 prefix = str(index)
             )
