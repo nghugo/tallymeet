@@ -11,7 +11,7 @@ from django.http import HttpResponseForbidden
 
 from .forms import (PollPasswordForm, PollCreateForm, PollUpdatePasswordForm, 
                     PollVoteResponderMetaForm, PollVoteForm)
-from .models import Poll
+from .models import Poll, PollResponderXref
 from .views_helper import (getSavedPollPassword, getRankedResponses, 
                            addDenseRank, getExisting_pollOptionUserResponses)
 from .views_helper import get_item  # not explicitly called, but required for dictionary query inside template of DetailView 
@@ -46,7 +46,21 @@ class PollCreateView(SuccessMessageMixin, CreateView):
             self.request.session['pollPasswordAtPollCreation'] = self.request.POST.get('poll_password')  # pollPasswordAtPollCreation purpose -> do not have to re-enter when redirected to details
             poll_password_hashed = make_password(self.request.POST.get('poll_password'))  
             form.instance.poll_password = poll_password_hashed
-        return super().form_valid(form)
+
+            response = super(PollCreateView, self).form_valid(form)
+
+            # if user is registered, add the (responder_user_id, poll_id) pair to PollResponderXref if not already existing
+            if self.request.user.is_authenticated:
+                existingPair = PollResponderXref.objects.filter(responder_user_id = self.request.user, poll_id = self.object).first()
+                if not existingPair:
+                    PollResponderXref(responder_user_id = self.request.user, poll_id = self.object).save()
+            
+            # if user is registered, set the owner to the current user
+            if self.request.user.is_authenticated:
+                self.object.owner_id = self.request.user
+                self.object.save()  # must save explicitly, as Django does not automatically persist updates, only additions/ deletions
+
+        return response
     
 
 class PollDetailView(DetailView):  # default template is poll/poll_detail.html
@@ -327,6 +341,12 @@ def vote(request, pk):
                     response = voteForm["response"].value(),
                 )
                 vote.save()
+            
+            # if user is registered, add the (responder_user_id, poll_id) pair to PollResponderXref if not already existing
+            if request.user.is_authenticated:
+                existingPair = PollResponderXref.objects.filter(responder_user_id = request.user, poll_id = pollObject).first()
+                if not existingPair:
+                    PollResponderXref(responder_user_id = request.user, poll_id = pollObject).save()
             return redirect("poll-detail", pk=pk)
 
     else:  # GET request
