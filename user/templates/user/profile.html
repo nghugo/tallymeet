@@ -2,15 +2,47 @@
 {% load crispy_forms_tags %}
 {% block content %}
     <div class="container px-4 my-4 mx-auto">
-        <h1 class="mb-6 text-3xl md:text-4xl lg:max-xl:text-3xl font-bold font-heading leading-none text-center md:text-left">Your Profile</h1>
-        <div class="">
-            <p class="">Display name: {{ user.display_name }}</p>
-            <p class="">Email: {{ user.email }}</p>
+        <div class="outline outline-2 outline-slate-400 py-2 px-5 rounded-lg mb-5">
+            <h1 class="mb-6 text-3xl md:text-4xl lg:max-xl:text-3xl font-bold font-heading leading-none text-center md:text-left">Create a Poll</h1>
+            <div class="flex justify-end">
+                <a href="/poll/create/" class="inline-block min-w-full sm:min-w-[350px] py-4 px-6 mb-1 text-center text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200">
+                    Create a Poll
+                </a>
+            </div>
         </div>
-        <div class="flex flex-wrap justify-end">
-            <a href="{% url 'user-displayname-change' %}" class="block min-w-full sm:min-w-min py-4 px-6 sm:ml-4 my-1 text-center text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200">Update Your Display Name</a>
-            <a href="{% url 'user-password-change' %}" class="block min-w-full sm:min-w-min py-4 px-6 sm:ml-4 my-1 text-center text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200">Update Your Password</a>
-            <a href="{% url 'user-delete-request' %}" class="block min-w-full sm:min-w-min py-4 px-6 sm:ml-4 my-1 text-center text-white font-semibold border border-red-700 rounded-xl focus:ring focus:ring-red-300 bg-red-600 hover:bg-red-700 transition ease-in-out duration-200">Delete Your Account</a>
+        
+
+        <div class="outline outline-2 outline-slate-400 py-2 px-5 rounded-lg mb-5">
+            <h1 class="mb-6 text-3xl md:text-4xl lg:max-xl:text-3xl font-bold font-heading leading-none text-center md:text-left">Your Profile</h1>
+            <div class="py-4 flex flex-col sm:flex-row bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                <p class=" pb-1 min-w-[250px] font-medium text-gray-900 whitespace-nowrap dark:text-white"> Display Name </p>
+                <p> {{ user.display_name }} </p>
+            </div>
+            <div class="py-4 flex flex-col sm:flex-row bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                <p class=" pb-1 min-w-[250px] font-medium text-gray-900 whitespace-nowrap dark:text-white"> Email </p>
+                <p> {{ user.email }} </p>
+            </div>
+            
+            <div class="pt-4 flex flex-wrap justify-end">
+                <a href="{% url 'user-displayname-change' %}" class="block min-w-full sm:min-w-[350px] py-4 px-6 sm:ml-4 my-1 text-center text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200">Update Your Display Name</a>
+                <a href="{% url 'user-password-change' %}" class="block min-w-full sm:min-w-[350px] py-4 px-6 sm:ml-4 my-1 text-center text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200">Update Your Password</a>
+                <a href="{% url 'user-delete-request' %}" class="block min-w-full sm:min-w-[350px] py-4 px-6 sm:ml-4 my-1 text-center text-white font-semibold border border-red-700 rounded-xl focus:ring focus:ring-red-300 bg-red-600 hover:bg-red-700 transition ease-in-out duration-200">Delete Your Account</a>
+            </div>
         </div>
+
+        <div class="outline outline-2 outline-slate-400 py-2 px-5 rounded-lg mb-20">
+            <h1 class="mb-6 text-3xl md:text-4xl lg:max-xl:text-3xl font-bold font-heading leading-none text-center md:text-left">Polls You Have Created or Voted In</h1>
+            {% if xrefs|length > 0 %}
+                {% for x in xrefs %}
+                <div class="flex align-center justify-center sm:justify-start mb-2">
+                    <span class="self-center text-lg text-black font-semibold align-middle mr-2 min-w-[30px]"> {{ forloop.counter }}. </span>
+                    <a href="{% url 'poll-detail' x.poll_id.id %}" class="capitalize underline text-lg text-black font-semibold hover:text-emerald-500 transition ease-in-out duration-200">{{ x.poll_id.title }}</a>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="self-center text-lg text-black font-semibold mb-2"> None found<p>
+            {% endif %}
+        </div>
+
     </div>
 {% endblock content %}

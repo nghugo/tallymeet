@@ -11,8 +11,7 @@ from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 
-from captcha.fields import ReCaptchaField
-from captcha.widgets import ReCaptchaV3
+from poll.models import PollResponderXref
 
 from .forms import (UserRegisterForm, RecapAuthenticationForm, ResendConfirmationForm, 
                     PasswordResetForm, SetPasswordForm, SetDisplayNameForm,
@@ -98,7 +97,10 @@ class RecapLoginView(auth_views.LoginView):  # Just the login view with Google r
 
 @login_required
 def profile(request):
-    return render(request, 'user/profile.html')
+    xrefs = PollResponderXref.objects.filter(
+        responder_user_id = request.user
+    )
+    return render(request, 'user/profile.html', {'xrefs': xrefs})
 
 
 @login_required
