@@ -19,8 +19,10 @@
     
     {% comment %} <!-- for production: use tailwind output css rather than tailwind cdn -->
     <link rel="stylesheet" type="text/css" href="{% static 'tallymeet/css/output.css' %}" />
+    {% endcomment %}
+    
     <link rel="stylesheet" type="text/css" href="{% static 'tallymeet/css/extra.css' %}" />
-     {% endcomment %}
+     
      
     <!-- tailwind cdn needed to handle dynamic classes -->
     <script src="https://cdn.tailwindcss.com"></script>

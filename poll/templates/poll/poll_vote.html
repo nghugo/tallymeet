@@ -4,12 +4,12 @@
 
 {% block content %}
     <div class="container px-4 my-4 mx-auto">
+        <h1 class="mb-6 text-3xl md:text-4xl lg:max-xl:text-3xl font-bold font-heading leading-none text-center md:text-left">
+            Cast Your Vote
+        </h1>
         <form method="post" novalidate>
             {% csrf_token %}
-            <fieldset>
-                <legend class="mb-6 text-3xl md:text-4xl lg:max-xl:text-3xl font-bold font-heading leading-none text-center md:text-left">
-                    Cast Your Vote
-                </legend>
+            
 
                 <div class="">
                     {% for o, voteForm in oAndVoteForms %}
@@ -23,6 +23,8 @@
                                 <p class=" pb-1 min-w-[100px] font-medium text-gray-900 whitespace-nowrap dark:text-white"> End </p>
                                 <p> {{ o.event_end_time }} </p>
                             </div>
+                            
+                            {% comment %}                             
                             <div class="flex py-2">
                                 <div class="mr-5">
                                     <span> {{ voteForm.response.0.tag }} </span>
@@ -38,38 +40,35 @@
                                     <span> {{ voteForm.response.2.tag }} </span>
                                     <span> {{ voteForm.response.2.choice_label }} </span>
                                 </div>
-                            
                             </div>
+                            {% endcomment %}
+
+
                             
-                            <div class="mx-auto flex justify-around mt-32">
-                                <div class="radio-group inline-flex flex-row flex-initial justify-center rounded-lg">
-                                    <div class="radio" class="relative">
-                                        {% comment %} <input type="radio" id="huey" name="drone" value="huey" checked class="hidden absolute peer"> {% endcomment %}
-                                        {{ voteForm.response.0.tag }}
-                                        <label for="huey" class="block text-center px-4 py-3 bg-white border border-grey border-solid w-32 h-32 hover:cursor-pointer peer-checked:border-border-green-500 peer-checked:bg-teal-100">
-                                            <div class="text-3xl mb-2">⏱</div>
-                                          <div class="font-semibold"><strong>{{ voteForm.response.0.choice_label }}</strong></div>
-                                        </label>
-                                    </div>
-                                    <div class="radio bg-white border border-grey border-l-0" class="relative">
-                                        {% comment %} <input type="radio" id="dewey" name="drone" value="dewey" class="hidden absolute peer"> {% endcomment %}
-                                        {{ voteForm.response.1.tag }}
-                                        <label for="dewey" class="block text-center px-4 py-3 bg-white border border-grey border-solid w-32 h-32 hover:cursor-pointer peer-checked:border-border-green-500 peer-checked:bg-teal-100">
-                                            <div class="text-3xl mb-2">🚘</div>
-                                          <div class="font-semibold"><strong>{{ voteForm.response.1.choice_label }}</strong></div>
-                                        </label>
-                                    </div>
-                                    <div class="radio bg-white border border-grey border-l-0" class="relative">
-                                        
-                                        {% comment %} <input type="radio" id="louie" name="drone" value="louie" class="hidden absolute peer"> {% endcomment %}
-                                        {{ voteForm.response.2.tag }}
-                                        <label for="louie" class="block text-center px-4 py-3 bg-white border border-grey border-solid w-32 h-32 hover:cursor-pointer peer-checked:border-border-green-500 peer-checked:bg-teal-100">
-                                            <div class="text-3xl mb-2">🤷‍♂️</div>
-                                          <div class="font-semibold"><strong>{{ voteForm.response.2.choice_label }}</strong></div>
-                                        </label>
-                                    </div>
+                            <div class="radio-group flex flex-row flex-initial justify-between items-center rounded-lg py-2 max-w-md mx-auto lg:mx-0">
+                                <div class="radio w-[30%] max-w-[150px]">
+                                    {{ voteForm.response.0.tag }}
+                                    <label for="id_{{ forloop.counter0 }}-response_0" class="block text-center p-2 bg-white border border-grey border-solid h-min hover:cursor-pointer rounded-lg">
+                                        <div class="text-3xl mb-2">⏱</div>
+                                        <div class="font-semibold"><p>{{ voteForm.response.0.choice_label }}</p></div>
+                                    </label>
+                                </div>
+                                <div class="radio w-[30%] max-w-[150px]">
+                                    {{ voteForm.response.1.tag }}
+                                    <label for="id_{{ forloop.counter0 }}-response_1" class="block text-center p-2 bg-white border border-grey border-solid h-min hover:cursor-pointer rounded-lg">
+                                        <div class="text-3xl mb-2">🚘</div>
+                                        <div class="font-semibold"><p>{{ voteForm.response.1.choice_label }}</p></div>
+                                    </label>
+                                </div>
+                                <div class="radio w-[30%] max-w-[150px]">
+                                    {{ voteForm.response.2.tag }}
+                                    <label for="id_{{ forloop.counter0 }}-response_2" class="block text-center p-2 bg-white border border-grey border-solid h-min hover:cursor-pointer rounded-lg">
+                                        <div class="text-3xl mb-2">🤷‍♂️</div>
+                                        <div class="font-semibold"><p>{{ voteForm.response.2.choice_label }}</p></div>
+                                    </label>
                                 </div>
                             </div>
+                            
 
                             {% if not voteForm.is_valid %}
                                 {% for key, val in voteForm.errors.items %}
@@ -93,7 +92,7 @@
 
                 {{ metaForm|crispy }}
 
-            </fieldset>
+            
             <div class="flex flex-col sm:flex-row flex-wrap justify-center sm:justify-end items-center px-4">
                 <a href="{% url 'poll-detail' pk %}" class="block min-w-full sm:min-w-min py-4 px-6 sm:ml-4 my-1 text-center text-black font-semibold border border-gray-300 rounded-xl focus:ring focus:ring-emerald-300 bg-white hover:bg-gray-100 transition ease-in-out duration-200">Cancel</a>
                 <button class="block min-w-full sm:min-w-min py-4 px-6 sm:ml-4 my-1 text-white font-semibold border border-emerald-700 rounded-xl focus:ring focus:ring-emerald-300 bg-emerald-600 hover:bg-emerald-700 transition ease-in-out duration-200" type="submit">Save Vote</button>

@@ -41,12 +41,21 @@ ul.messages li.error {
 
 /* voting radio buttons */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer components {
-  div.radio input[type="radio"] {
-    @apply hidden absolute peer;
-  }
+.radio-group .radio{
+	position: relative;
 }
+
+div.radio input[type="radio"] {
+  visibility: hidden;
+  position: absolute;
+}
+
+div.radio input[type="radio"]:checked + label {
+  border-color:#38C172;
+	background-color:#E3FCEC;
+}
+
+
+
+/* div.radio input[type="radio"]: */
+/* peer-checked:border-border-green-500 peer-checked:bg-teal-100 */
