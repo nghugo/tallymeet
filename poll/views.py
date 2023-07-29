@@ -187,6 +187,8 @@ class PollUpdatePasswordView(UpdateView):
 
 
 def poll_verify_password(request):
+    """ Expects id to be in url parameter, 
+        and uses it to grab the password from request.session['entered_password_dict] """
     if request.method == 'POST':
         form = PollPasswordForm(request.POST)
         if form.is_valid():
@@ -273,13 +275,13 @@ def vote(request, pk):
     # password verification for both GET and POST
     poll_password_hashed = pollObject.poll_password
     entered_password = getSavedPollPassword(request.session, str(pk))
-    
+
     if pollObject.poll_password:
         if not entered_password:
-            return redirect(reverse('poll-verify-password')  + "?next=" + reverse('poll-vote', args=[pk]))
+            return redirect(reverse('poll-verify-password') + "?id=" + str(pk) + "&next=" + reverse('poll-vote', args=[pk]))
         elif not django_pbkdf2_sha256.verify(entered_password, poll_password_hashed):
             messages.add_message(request, messages.ERROR, "Incorrect password")
-            return redirect(reverse('poll-verify-password')  + "?next=" + reverse('poll-vote', args=[pk]))
+            return redirect(reverse('poll-verify-password')  + "?id=" + str(pk) + "&next=" + reverse('poll-vote', args=[pk]))
 
     
     pollOptions = PollOption.objects.filter(poll_id = pk)
