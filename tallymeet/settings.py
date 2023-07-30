@@ -30,7 +30,7 @@ SECRET_KEY = env("TALLYMEET_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = [*]
+ALLOWED_HOSTS = ['tallymeet.onrender.com']
 
 
 # Application definition
