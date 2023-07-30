@@ -1,0 +1,79 @@
+/* flash messages */
+
+ul.messages li {
+  padding-left: 1rem/* 16px */;
+  padding-right: 1rem/* 16px */;
+  padding-top: 0.75rem/* 12px */;
+  padding-bottom: 0.75rem/* 12px */;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 0.5rem/* 8px */;
+  margin-bottom: 0.5rem/* 8px */;
+  border-width: 1px;
+  border-radius: 0.25rem/* 4px */;
+  font-weight: 500;
+}
+ul.messages li.debug {
+  border-color: rgb(148 163 184);
+  background-color: rgb(241 245 249);
+  color: rgb(71 85 105);
+}
+ul.messages li.info {
+  border-color: rgb(56 189 248);
+  background-color: rgb(224 242 254);
+  color: rgb(2 132 199);
+}
+ul.messages li.success {
+  border-color: rgb(102, 231, 149);
+  background-color: rgb(220 252 231);
+  color: rgb(11, 100, 44);
+}
+ul.messages li.warning {
+  border-color: rgb(228, 172, 31);
+  background-color: rgb(252, 243, 207);
+  color: rgb(198, 108, 5);
+}
+ul.messages li.error {
+  border-color: rgb(254, 143, 143);
+  background-color: rgb(254 226 226);
+  color: rgb(220 38 38);
+}
+
+/* voting radio buttons */
+
+.radio-group .radio{
+	position: relative;
+}
+
+div.radio input[type="radio"] {
+  visibility: hidden;
+  position: absolute;
+}
+
+div.radio input[type="radio"]:checked + label[select-color="dark-green"] {
+	border-color:#64748b;
+  background-color:#0d9488;
+}
+
+div.radio input[type="radio"]:checked + label[select-color="light-green"] {
+	border-color:#64748b;
+  background-color:#14b8a6;
+}
+
+div.radio input[type="radio"]:checked + label[select-color="grey"] {
+	border-color:#64748b;
+  background-color:#94a3b8;
+}
+
+div.radio input[type="radio"]:checked + label path {
+	fill: white !important;
+}
+
+div.radio input[type="radio"]:checked + label div {
+	color: white !important;
+}
+
+
+
+/* div.radio input[type="radio"]: */
+/* peer-checked:border-border-green-500 peer-checked:bg-teal-100 */
