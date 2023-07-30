@@ -13,6 +13,10 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 
+import environ
+env = environ.Env()
+environ.Env.read_env()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,10 +25,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("TALLYMEET_SECRET_KEY")
+SECRET_KEY = env("TALLYMEET_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = []
 
@@ -80,12 +84,17 @@ WSGI_APPLICATION = "tallymeet.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+import dj_database_url
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    'default': dj_database_url.parse(env('DATABASE_URL'))
 }
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
 
 
 # Password validation
@@ -147,13 +156,13 @@ AUTH_USER_MODEL = 'user.User'
 # Emailing settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_FROM = os.environ.get("GMAIL_TALLYMEET_ACC")
-EMAIL_HOST_USER = os.environ.get("GMAIL_TALLYMEET_ACC")
-EMAIL_HOST_PASSWORD = os.environ.get("GMAIL_TALLYMEET_PASS")
+EMAIL_FROM = env("GMAIL_TALLYMEET_ACC")
+EMAIL_HOST_USER = env("GMAIL_TALLYMEET_ACC")
+EMAIL_HOST_PASSWORD = env("GMAIL_TALLYMEET_PASS")
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 PASSWORD_RESET_TIMEOUT = 14400
 
 # RECAPTCHA
-RECAPTCHA_PUBLIC_KEY = os.environ.get("TALLYMEET_RECAPTCHA_PUBLIC_KEY")
-RECAPTCHA_PRIVATE_KEY = os.environ.get("TALLYMEET_RECAPTCHA_SECRET_KEY")
+RECAPTCHA_PUBLIC_KEY = env("TALLYMEET_RECAPTCHA_PUBLIC_KEY")
+RECAPTCHA_PRIVATE_KEY = env("TALLYMEET_RECAPTCHA_SECRET_KEY")
