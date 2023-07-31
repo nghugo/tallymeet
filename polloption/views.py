@@ -34,9 +34,9 @@ def pollOptionEdit(request):
             for instance in instances:
                 instance.poll_id = pollObject
                 instance.save()
-            messages.add_message(request, messages.SUCCESS, "Poll options updated successfully")
+            messages.add_message(request, messages.SUCCESS, "Time slots updated successfully")
             return redirect('poll-detail', pk=poll_id)
-        messages.add_message(request, messages.ERROR, "Poll option updates failed due to invalid form input (all updates aborted)")
+        messages.add_message(request, messages.ERROR, "Time slot updates failed due to invalid form input (all updates aborted)")
     else:  # GET request
         formset = PollOptionEditFormSet(queryset = pollOptions)
     
@@ -69,9 +69,9 @@ def pollOptionCreate(request):
         form = PollOptionEditForm(request.POST, initial={'poll_id' : poll_id})
         if form.is_valid():
             form.save()
-            messages.add_message(request, messages.SUCCESS, "Poll option created successfully")
+            messages.add_message(request, messages.SUCCESS, "Time slot created successfully")
             return redirect('poll-detail', pk=poll_id)
-        messages.add_message(request, messages.ERROR, "Poll option creation failed due to invalid form input")
+        messages.add_message(request, messages.ERROR, "Time slot creation failed due to invalid form input")
     else:  # GET request
         form = PollOptionEditForm(initial={'poll_id' : poll_id})
 
@@ -110,7 +110,7 @@ def pollOptionDeleteList(request):
 
 class PollOptionDeleteView(SuccessMessageMixin, DeleteView):
     model = PollOption
-    success_message = "Poll option deleted successfully"
+    success_message = "Time slot deleted successfully"
     # default template is 'polloption/polloption_confirm_delete.html'
     
     def get_success_url(self):
