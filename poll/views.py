@@ -84,10 +84,6 @@ class PollDetailView(DetailView):  # default template is poll/poll_detail.html
         # Fetch counts for each poll option, sort, and add dense rank
         rankedResponses = getRankedResponses(self.object)      
         rankedResponses = addDenseRank(rankedResponses)
-
-        # # DEBUG
-        # for obj in rankedResponses:
-        #     print(obj)
             
         context = self.get_context_data(
             object = self.object, 
