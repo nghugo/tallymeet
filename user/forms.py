@@ -14,7 +14,7 @@ from user.models import User
 class UserRegisterForm(UserCreationForm):
     email = forms.EmailField(max_length=320)
     display_name = forms.CharField(max_length=255)
-    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")
+    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.4}), label="")
         
     def __init__(self, *args, **kwargs):
         super(UserRegisterForm, self).__init__(*args, **kwargs)
@@ -38,24 +38,24 @@ class UserRegisterForm(UserCreationForm):
 
 
 class RecapAuthenticationForm(AuthenticationForm):
-    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")
+    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.4}), label="")
 
 class ResendConfirmationForm(forms.Form):
     email = forms.EmailField()
-    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")
+    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.4}), label="")
 
 class PasswordResetForm(PasswordResetForm):
     def __init__(self, *args, **kwargs):
         super(PasswordResetForm, self).__init__(*args, **kwargs)
 
-    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")
+    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.4}), label="")
 
 class SetPasswordForm(SetPasswordForm):
     class Meta:
         model = User
         fields = ['new_password1', 'new_password2']
 
-    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")
+    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.4}), label="")
 
 class SetDisplayNameForm(ModelForm):
     display_name = forms.CharField(max_length=255)
@@ -64,9 +64,9 @@ class SetDisplayNameForm(ModelForm):
         fields = ['display_name']
 
 class UserDeleteRequestForm(Form):
-    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")
+    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.4}), label="")
 
 class UserDeleteConfirmForm(Form):
     password = forms.CharField(label="Account Password", widget=forms.PasswordInput(), help_text='Please enter your account password to confirm account deletion')
-    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")
+    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.4}), label="")
 

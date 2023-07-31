@@ -47,18 +47,18 @@ class PollCreateView(SuccessMessageMixin, CreateView):
             poll_password_hashed = make_password(self.request.POST.get('poll_password'))  
             form.instance.poll_password = poll_password_hashed
 
-            response = super(PollCreateView, self).form_valid(form)
+        response = super(PollCreateView, self).form_valid(form)
 
-            # if user is registered, add the (responder_user_id, poll_id) pair to PollResponderXref if not already existing
-            if self.request.user.is_authenticated:
-                existingPair = PollResponderXref.objects.filter(responder_user_id = self.request.user, poll_id = self.object).first()
-                if not existingPair:
-                    PollResponderXref(responder_user_id = self.request.user, poll_id = self.object).save()
-            
-            # if user is registered, set the owner to the current user
-            if self.request.user.is_authenticated:
-                self.object.owner_id = self.request.user
-                self.object.save()  # must save explicitly, as Django does not automatically persist updates, only additions/ deletions
+        # if user is registered, add the (responder_user_id, poll_id) pair to PollResponderXref if not already existing
+        if self.request.user.is_authenticated:
+            existingPair = PollResponderXref.objects.filter(responder_user_id = self.request.user, poll_id = self.object).first()
+            if not existingPair:
+                PollResponderXref(responder_user_id = self.request.user, poll_id = self.object).save()
+        
+        # if user is registered, set the owner to the current user
+        if self.request.user.is_authenticated:
+            self.object.owner_id = self.request.user
+            self.object.save()  # must save explicitly, as Django does not automatically persist updates, only additions/ deletions
 
         return response
     

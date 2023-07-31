@@ -10,7 +10,7 @@ from polloption.models import PollOptionResponse, PollOption
 
 class PollPasswordForm(forms.Form):
     poll_password = forms.CharField(max_length=200, widget=forms.PasswordInput)
-    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")
+    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.4}), label="")
 
 
 class PollCreateForm(ModelForm):
@@ -23,7 +23,7 @@ class PollCreateForm(ModelForm):
     event_location = forms.CharField(label="Event Location (optional)", required=False, help_text='If your event is video-based, consider putting the link here')
     poll_password = forms.CharField(label="Poll Password (optional)", widget=forms.PasswordInput(), help_text='Set and share a poll password so only your group can access this poll', required=False)
     poll_password_confirm = forms.CharField(label="Confirm Poll Password (if entered above)", widget=forms.PasswordInput(), help_text='Please leave blank if a poll password has not been entered above', required=False)
-    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")
+    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.4}), label="")
 
     def clean(self):
         cleaned_data = super().clean()
@@ -63,4 +63,4 @@ class PollVoteResponderMetaForm(Form):
     responder_nonuser_id = forms.CharField(disabled=True, required=False, widget = forms.HiddenInput()) # disable to prevent modification
 
     responder_name = forms.CharField(required=True, label="Responder Name")  # allow user to modify
-    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.85}), label="")
+    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score':0.4}), label="")
