@@ -7,7 +7,7 @@
             <fieldset>
                 <legend class="mb-6 text-3xl md:text-4xl lg:max-xl:text-3xl font-bold font-heading leading-none text-center md:text-left">Delete User Account Confirmation</legend>
                 {{ form|crispy }}
-                <p> Please note that this action is irreversible.</p>
+                <p class="text-gray-900 tmp2"> Please note that this action is irreversible.</p>
             </fieldset>
             <div class="flex flex-col sm:flex-row flex-wrap justify-center sm:justify-end items-center px-4">
                 <a href="{% url 'user-profile' %}" class="block min-w-full sm:min-w-min py-4 px-6 sm:ml-4 my-1 text-center text-black font-semibold border border-gray-300 rounded-xl focus:ring focus:ring-emerald-300 bg-white hover:bg-gray-100 transition ease-in-out duration-200">Cancel</a>

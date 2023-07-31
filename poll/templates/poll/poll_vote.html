@@ -18,13 +18,13 @@
                     {% for o, voteForm in oAndVoteForms %}
 
                         <div class="outline outline-2 outline-slate-400 py-2 px-5 rounded-lg mb-5">
-                            <div class="py-2 flex flex-col sm:flex-row bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                <p class=" pb-1 min-w-[100px] font-medium text-gray-900 whitespace-nowrap dark:text-white"> Start </p>
-                                <p> {{ o.event_start_time }} </p>
+                            <div class="py-2 flex flex-col sm:flex-row bg-white border-b tmp1">
+                                <p class=" pb-1 min-w-[100px] font-medium text-gray-900 whitespace-nowrap tmp2"> Start </p>
+                                <p class="text-gray-900 tmp2"> {{ o.event_start_time }} </p>
                             </div>
-                            <div class="py-2 flex flex-col sm:flex-row bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                <p class=" pb-1 min-w-[100px] font-medium text-gray-900 whitespace-nowrap dark:text-white"> End </p>
-                                <p> {{ o.event_end_time }} </p>
+                            <div class="py-2 flex flex-col sm:flex-row bg-white border-b tmp1">
+                                <p class=" pb-1 min-w-[100px] font-medium text-gray-900 whitespace-nowrap tmp2"> End </p>
+                                <p class="text-gray-900 tmp2"> {{ o.event_end_time }} </p>
                             </div>
                             
                             
@@ -33,21 +33,21 @@
                                     {{ voteForm.response.0.tag }}
                                     <label for="id_{{ forloop.counter0 }}-response_0" select-color="dark-green" class="block text-center p-2 bg-white border border-gray-300 border-solid h-min hover:cursor-pointer rounded-lg">
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="heart" class="w-10 h-10 mx-auto"><path fill="#0d9488" d="M20.16,5A6.29,6.29,0,0,0,12,4.36a6.27,6.27,0,0,0-8.16,9.48l6.21,6.22a2.78,2.78,0,0,0,3.9,0l6.21-6.22A6.27,6.27,0,0,0,20.16,5Zm-1.41,7.46-6.21,6.21a.76.76,0,0,1-1.08,0L5.25,12.43a4.29,4.29,0,0,1,0-6,4.27,4.27,0,0,1,6,0,1,1,0,0,0,1.42,0,4.27,4.27,0,0,1,6,0A4.29,4.29,0,0,1,18.75,12.43Z"></path></svg>
-                                        <div class="font-bold text-[#0d9488]"><p>{{ voteForm.response.0.choice_label }}</p></div>
+                                        <div class="font-bold text-[#0d9488]"><p class="text-gray-900 tmp2">{{ voteForm.response.0.choice_label }}</p></div>
                                     </label>
                                 </div>
                                 <div class="radio w-[30%] max-w-[150px]">
                                     {{ voteForm.response.1.tag }}
                                     <label for="id_{{ forloop.counter0 }}-response_1" select-color="light-green" class="block text-center p-2 bg-white border border-gray-300 border-solid h-min hover:cursor-pointer rounded-lg">
                                         <svg xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" viewBox="0 0 24 24" id="grin" class="w-10 h-10 mx-auto"><path fill="#14b8a6" d="M9,11a1,1,0,1,0-1-1A1,1,0,0,0,9,11Zm3-9A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm0,18a8,8,0,1,1,8-8A8,8,0,0,1,12,20Zm3-7H9a1,1,0,0,0-1,1,4,4,0,0,0,8,0A1,1,0,0,0,15,13Zm-3,3a2,2,0,0,1-1.73-1h3.46A2,2,0,0,1,12,16Zm3-7a1,1,0,1,0,1,1A1,1,0,0,0,15,9Z"></path></svg>
-                                        <div class="font-bold text-[#14b8a6]"><p>{{ voteForm.response.1.choice_label }}</p></div>
+                                        <div class="font-bold text-[#14b8a6]"><p class="text-gray-900 tmp2">{{ voteForm.response.1.choice_label }}</p></div>
                                     </label>
                                 </div>
                                 <div class="radio w-[30%] max-w-[150px]">
                                     {{ voteForm.response.2.tag }}
                                     <label for="id_{{ forloop.counter0 }}-response_2" select-color="grey" class="block text-center p-2 bg-white border border-gray-300 border-solid h-min hover:cursor-pointer rounded-lg">
                                         <svg xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" viewBox="0 0 24 24" id="frown" class="w-10 h-10 mx-auto"><path fill="#94a3b8" d="M8.36,15.33a1,1,0,0,0-.13,1.4,1,1,0,0,0,1.41.13,3.76,3.76,0,0,1,4.72,0,1,1,0,0,0,1.41-.13,1,1,0,0,0-.13-1.4A5.81,5.81,0,0,0,8.36,15.33ZM9,11a1,1,0,1,0-1-1A1,1,0,0,0,9,11Zm3-9A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm0,18a8,8,0,1,1,8-8A8,8,0,0,1,12,20ZM15,9a1,1,0,1,0,1,1A1,1,0,0,0,15,9Z"></path></svg>
-                                        <div class="font-bold text-[#94a3b8]"><p>{{ voteForm.response.2.choice_label }}</p></div>
+                                        <div class="font-bold text-[#94a3b8]"><p class="text-gray-900 tmp2">{{ voteForm.response.2.choice_label }}</p></div>
                                     </label>
                                 </div>
                             </div>
@@ -61,8 +61,8 @@
                         </div>
                         
                         {% comment %} <div class="outline outline-2 outline-slate-400 p-2 rounded-lg mb-5">
-                            <p> Event start time: {{ o.event_start_time }} </p>
-                            <p> Event end time: {{ o.event_end_time }} </p>
+                            <p class="text-gray-900 tmp2"> Event start time: {{ o.event_start_time }} </p>
+                            <p class="text-gray-900 tmp2"> Event end time: {{ o.event_end_time }} </p>
                             {{ voteForm|crispy }}  <!-- For debugging -->
                         </div> {% endcomment %}
 
